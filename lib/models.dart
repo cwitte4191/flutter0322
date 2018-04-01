@@ -36,8 +36,21 @@ class ResultsSummary{
     return _summaryMap[carNumber];
   }
 }
+abstract class HasRaceMetaData
+{
 
-abstract class DisplayableRace implements HasCarNumbers, HasResultsSummary {}
+  RaceMetaData getRaceMetaData();
+}
+ class RaceMetaData{
+
+  final String raceUpdateTime;
+  final String chartPosition;
+  final String raceBracketName;
+  RaceMetaData({this.raceBracketName,this.chartPosition,this.raceUpdateTime});
+}
+abstract class DisplayableRace implements HasCarNumbers, HasResultsSummary, HasRaceMetaData{}
+
+
 
 class RaceStanding implements DisplayableRace {
   int id;
@@ -74,6 +87,13 @@ class RaceStanding implements DisplayableRace {
   List<int> getCarNumbers() {
     return []..add(racePair.car1)..add(racePair.car2);
   }
+
+  @override
+  RaceMetaData getRaceMetaData() {
+    return new RaceMetaData(chartPosition: this.chartPosition,);
+  }
+
+
 }
 
 class RacePhase implements DisplayableRace {
@@ -131,4 +151,10 @@ class RacePhase implements DisplayableRace {
   List<int> getCarNumbers() {
     return raceEntries.keys.toList();
   }
+
+  @override
+  RaceMetaData getRaceMetaData() {
+    return new RaceMetaData(raceUpdateTime: this.startMs.toString(),);
+  }
+
 }

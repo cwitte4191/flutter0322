@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import '../models/racer.dart';
 import '../models.dart';
 import '../widgets/RaceResultWidget.dart';
 import '../DerbyNavDrawer.dart';
 import '../derbyBodyWidgets.dart';
+import '../testData.dart';
 
 class RacerApp extends StatelessWidget {
   // This widget is the root of your application.
+  final List<Racer> racerList;
+
+  RacerApp({ this.racerList}){}
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -13,37 +18,17 @@ class RacerApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: new MyHomePage(title: 'Flutter Demo Home Page'),
+      home: new RacerHome(title: "Racers", racerList: racerList,),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class RacerHome extends StatelessWidget {
+
 
   final String title;
-
-  @override
-  _MyHomePageState createState() => new _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-
-
-
+  final List<Racer> racerList;
+  RacerHome({this.title, this.racerList});
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +43,12 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: new Text(widget.title),
+        title: new Text(title),
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
-      body: new DerbyBodyWidgets().getRacerListBody(),
+      body: new DerbyBodyWidgets().getRacerListBody(racerList),
       floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: ()=>{},
         tooltip: 'Increment',
         child: new Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

@@ -11,6 +11,12 @@ dependencies:
   cupertino_icons: "^0.1.0"
   json_object: "^1.0.19"
   xml: "^3.0.0"
+  cached_network_image: "^0.3.0"
+  pubsub: "^1.1.9"
+
+  #wilt:
+  #  git: https://github.com/shamblett/wilt.git
+
   #dartson: "^0.2.7"
   #firebase_auth: "^0.2.3"
   #google_sign_in: "^0.3.1"

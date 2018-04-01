@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'models/racer.dart';
 import 'models.dart';
 import 'widgets/RaceResultWidget.dart';
 import 'widgets/RacerWidget.dart';
@@ -23,8 +24,7 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getRacerListBody() {
-    var racers = new TestData().getTestRacers();
+  Widget getRacerListBody(List<Racer> racers) {
     var racerWidgetList = new List<Widget>();
 
     for (var x = 0; x < racers.length; x++) {

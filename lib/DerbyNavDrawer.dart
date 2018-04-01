@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'testData.dart';
 import 'appPages/RacerApp.dart';
 import 'appPages/RaceHistoryApp.dart';
-import 'appPages/RaceListApp.dart';
+import 'appPages/RaceSelectionApp.dart';
+import 'models/RaceBracketDetail.dart';
 import 'main.dart';
-import 'dart:async';
-import 'network/GetS3Object.dart';
+import 'appPages/tab2.dart';
 
 class DerbyNavDrawer {
   static Drawer getDrawer(BuildContext context) {
+
     return new Drawer(
 // Add a ListView to the drawer. This ensures the user can scroll
 // through the options in the Drawer if there isn't enough vertical
@@ -34,26 +36,32 @@ class DerbyNavDrawer {
           new ListTile(
             title: new Text('Racers'),
             onTap: () {
+              var racerList=new TestData().getTestRacers();
               Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new RacerApp()));
+                  new MaterialPageRoute(builder: (context) => new RacerApp(racerList: racerList)));
             },
           ),
           new ListTile(
-            title: new Text('Brackets'),
+            title: new Text('Race Selection'),
             onTap: () {
 
-              loadAndPush(context);
+              RaceSelectionApp.loadAndPush(context);
+            },
+          ),
+          new ListTile(
+            title: new Text('Bracket with Tabs'),
+            onTap: () {
+
+              RaceBracketDetail rbd=new TestData().getRbd();
+
+              Navigator.push(context,
+                  new MaterialPageRoute(builder: (context) => new TabBarDemo(rbd)));
+              //Navigator.pop(context);
             },
           ),
         ],
       ),
     );
   }
-  static loadAndPush(BuildContext context) async {
-    var flist=await new GetS3Object().getS3BucketList("all.derby.rr1.us");
 
-    print("loadAndPush: "+flist.toString());
-    Navigator.push(context,
-        new MaterialPageRoute(builder: (context) => new RaceListApp(flist:flist)));
-  }
 }
