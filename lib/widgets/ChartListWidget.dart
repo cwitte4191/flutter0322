@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/racer.dart';
+import '../models.dart';
 import '../network/GetS3Object.dart';
 class ChartListWidget extends StatelessWidget {
   final double f1 = 1.8;

@@ -1,3 +1,5 @@
+part of models;
+
 class Racer {
   String racerName;
   int carNumber;

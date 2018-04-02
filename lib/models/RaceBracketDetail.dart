@@ -1,10 +1,11 @@
-import '../models.dart';
-import 'dart:collection';
+part of models;
+
+//import '../models.dart';
 
 class RaceBracketDetail{
   String raceTitle;
   String templateName;
-  var places=new SplayTreeMap<String,int> ();
+  final places=new SplayTreeMap<String,int> ();
   var heatDetailMap=new Map<String,HeatDetail>();
 
   Map<String,List<DisplayableRace>> getDisplayableRaceByRound(){
@@ -21,6 +22,9 @@ class RaceBracketDetail{
     if(places !=null && places.length>0){
       rc["Places"]=new List<DisplayableRace>();
       for(String place in places.keys){
+        print ("Place:"+place);
+        print ("Place car:"+places[place].toString());
+        //rc["Places"].add(new DisplayablePlace(place: place,carNumber: 044));
         rc["Places"].add(new DisplayablePlace(place: place,carNumber: places[place]));
       }
     }
@@ -29,7 +33,14 @@ class RaceBracketDetail{
   RaceBracketDetail.fromJsonMap(Map jsonMap){
     this.raceTitle=jsonMap["raceTitle"];
     this.templateName=jsonMap["templateName"];
-    this.places=jsonMap["places"];
+
+    for(String key in jsonMap["places"].keys){
+      places[key]=jsonMap["places"][key];
+    }
+
+
+
+      //this.places=jsonMap["places"];
 
     var hd=jsonMap['heatDetailMap'];
     for(String key in hd.keys) {
@@ -54,13 +65,14 @@ class RaceBracketDetail{
 class DisplayablePlace implements DisplayableRace{
   final String place;
   final int carNumber;
-  DisplayablePlace({this.carNumber,this.place}){
+  DisplayablePlace({this.carNumber,this.place}):assert( carNumber!=null){
 
 }
 
   @override
   List<int> getCarNumbers() {
-    return new List<int>()..add(this.carNumber);
+    return new List<int>()
+    ..add(this.carNumber);
   }
 
   @override

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'models/racer.dart';
 import 'models.dart';
 import 'widgets/RaceResultWidget.dart';
 import 'widgets/RacerWidget.dart';

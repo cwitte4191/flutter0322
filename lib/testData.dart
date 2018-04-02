@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'models/racer.dart';
-import 'models/RaceBracketDetail.dart';
+import 'models.dart';
 class TestData{
   List<Racer> getTestRacers(){
     var rc=new List<Racer>();

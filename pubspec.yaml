@@ -14,6 +14,8 @@ dependencies:
   cached_network_image: "^0.3.0"
   pubsub: "^1.1.9"
 
+  wilt:
+     path: /Users/cwitte/scratch/wilt
   #wilt:
   #  git: https://github.com/shamblett/wilt.git
 

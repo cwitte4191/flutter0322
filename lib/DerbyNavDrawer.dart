@@ -3,7 +3,7 @@ import 'testData.dart';
 import 'appPages/RacerApp.dart';
 import 'appPages/RaceHistoryApp.dart';
 import 'appPages/RaceSelectionApp.dart';
-import 'models/RaceBracketDetail.dart';
+import 'models.dart';
 import 'main.dart';
 import 'appPages/tab2.dart';
 

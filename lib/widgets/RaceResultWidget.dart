@@ -40,6 +40,7 @@ class RaceResultWidget extends StatelessWidget {
 
   static Widget getFinishFlagWidget() {
     if (true) {
+      return _getFixedFFWidget();
       return _getCachedLakeWidget();
       return _getLakeWidget();
     }
@@ -49,9 +50,22 @@ class RaceResultWidget extends StatelessWidget {
                 image: new AssetImage("images/finish_flag.png"))));
   }
 
+  static Widget _getFixedFFWidget() {
+    return new Image(
+        //width: 50.0,
+        //height: 50.0,
+        //fit: BoxFit.scaleDown,
+        image: new AssetImage("images/finish_flag.png"));
+  }
+
   getChildTableRows(DisplayableRace displayableRace, Map driverMap) {
     var rc = [];
-
+    if (displayableRace.getRaceMetaData().chartPosition != null) {
+      rc.add(new TableRow(children: <Widget>[
+        new Text(""),
+        new Text(displayableRace.getRaceMetaData().chartPosition)
+      ]));
+    }
     var resultsSummary = new ResultsSummary();
     displayableRace.getResultsSummary(resultsSummary);
 
@@ -94,7 +108,8 @@ class DriverResultWidget extends StatelessWidget {
   final List<String> supplementalText;
   const DriverResultWidget(
       {Key, key, this.carNumber, this.driverName, this.supplementalText})
-      : super(key: key);
+      : assert(carNumber != null),
+        super(key: key);
 /*
   DriverResultWidget.fromRacePhase(RacePhase rp): this.carNumber{
 
@@ -109,10 +124,11 @@ class DriverResultWidget extends StatelessWidget {
       safeDriverName = "";
     }
 
-    String safeCarNumber=carNumber.toString();
-    if(carNumber >=9000 && carNumber<=10000 ){
-      safeCarNumber="Bye";
+    String safeCarNumber = carNumber.toString();
+    if (carNumber >= 9000 && carNumber <= 10000) {
+      safeCarNumber = "Bye";
     }
+
     var rowWidgets = [];
     rowWidgets.add(new Row(children: <Widget>[
       new Text(
