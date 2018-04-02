@@ -48,6 +48,7 @@ class RacePhase implements DisplayableRace {
     } else {
       resultsSummary.addMessage(
           winner.carNumber, "Phase ${phase}: ${winningMS}MS");
+      resultsSummary.setIcon(winner.carNumber, RaceResultWidget.getFinishFlagWidget());
     }
   }
 

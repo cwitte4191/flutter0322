@@ -17,17 +17,22 @@ class RaceStanding implements DisplayableRace {
 
     if (phase2DeleaMS == null) return;
     int overallMS = phase1DeltaMS + phase2DeleaMS;
-    if (overallMS < 0) {
-      resultsSummary.addMessage(racePair.car2,"Overall: ${overallMS}MS");
-    }
-    if (overallMS > 0) {
-      resultsSummary.addMessage(racePair.car1,"Overall: ${overallMS}MS");
-    }
-
     if (overallMS == 0) {
       resultsSummary.addMessage(racePair.car1,"Overall: Tied");
       resultsSummary.addMessage(racePair.car2,"Overall: Tied");
     }
+    int winningCar=null;
+    if (overallMS < 0) {
+      winningCar=racePair.car2;
+    }
+    if (overallMS > 0) {
+      winningCar=racePair.car1;
+    }
+    resultsSummary.addMessage(winningCar,"Overall: ${overallMS.abs()}MS");
+    resultsSummary.setIcon(winningCar,RaceResultWidget.getFinishFlagWidget());
+
+
+
   }
 
   @override

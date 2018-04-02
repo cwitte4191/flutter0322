@@ -15,7 +15,7 @@ class RaceSelectionApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _runTimer();
+    // _runTimer();
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
@@ -28,15 +28,18 @@ class RaceSelectionApp extends StatelessWidget {
   _runTimer() {
     const timeout = const Duration(seconds: 3);
     const ms = const Duration(milliseconds: 1);
-    void handleTimeout() {
+    void handleTimeout(Timer q) {
       // callback function
-      print("timeout: " + new DateTime.now().millisecondsSinceEpoch.toString());
+      print("timeout from RSA: " + new DateTime.now().millisecondsSinceEpoch.toString());
     }
 
     startTimeout([int milliseconds]) {
-      var duration = milliseconds == null ? timeout : ms * milliseconds;
-      return new Timer(duration, handleTimeout);
+      //var duration = milliseconds == null ? timeout : ms * milliseconds;
+      //return new Timer(duration, handleTimeout);
+      const oneSec = const Duration(seconds:5);
+      new Timer.periodic(oneSec, handleTimeout);
     }
+
 
     timer = startTimeout(2000);
   }

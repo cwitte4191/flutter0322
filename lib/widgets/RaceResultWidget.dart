@@ -72,13 +72,17 @@ class RaceResultWidget extends StatelessWidget {
     for (var carNumber in displayableRace.getCarNumbers()) {
       var driverName = driverMap[carNumber];
 
+      var iconWidget=resultsSummary.getIcon(carNumber);
+      if(iconWidget==null){
+        iconWidget=new Text("");
+      }
       //print("raceEntry car:"+raceEntry.carNumber.toString());
       //print("raceEntry driver:"+driverMap.values.toString());
       //print("raceEntry driver:"+driverName);
       //resultsSummary[raceEntry].add("foo");
       rc.add(new TableRow(children: <Widget>[
         //new Text("foo"),
-        getFinishFlagWidget(),
+        iconWidget,
         new DriverResultWidget(
             driverName: driverMap[carNumber],
             carNumber: carNumber,

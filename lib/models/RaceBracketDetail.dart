@@ -79,9 +79,20 @@ class DisplayablePlace implements DisplayableRace{
   RaceMetaData getRaceMetaData() {
     return new RaceMetaData(chartPosition: this.place);
   }
+static final RegExp regexNum= new RegExp(r"(\d+)");
 
   @override
   void getResultsSummary(ResultsSummary resultsSummary) {
+    if(this.carNumber !=null){
+      final Match placeIconText=regexNum.firstMatch(place);
+      if(placeIconText!=null) {
+        resultsSummary.setIcon(this.carNumber,
+            new Padding(
+            padding: const EdgeInsets.all(16.0),
+            child:
+            new Text(placeIconText.group(0),textScaleFactor: 4.0)));
+      }
+    }
     return;
   }
 }
@@ -99,6 +110,10 @@ class HeatDetail implements DisplayableRace{
 
   @override
   void getResultsSummary(ResultsSummary resultsSummary) {
+
+    if(winner !=null){
+      resultsSummary.setIcon(winner, RaceResultWidget.getFinishFlagWidget());
+    }
     return;
   }
 
