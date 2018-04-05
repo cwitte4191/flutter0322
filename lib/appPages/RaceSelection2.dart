@@ -4,11 +4,12 @@ import '../widgets/RaceResultWidget.dart';
 import '../DerbyNavDrawer.dart';
 import '../derbyBodyWidgets.dart';
 import '../testData.dart';
+import '../network/GetS3Object.dart';
 
-class RacerHome extends StatelessWidget {
+class RaceSelection2 extends StatelessWidget {
   final String title;
-  final List<Racer> racerList;
-  RacerHome({this.title="Racers", this.racerList});
+  final Map<String, String> flist;
+  RaceSelection2({this.title="Race Selection", this.flist});
 
   @override
   Widget build(BuildContext context) {
@@ -17,12 +18,19 @@ class RacerHome extends StatelessWidget {
         title: new Text(title),
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
-      body: new DerbyBodyWidgets().getRacerListBody(racerList),
+      body: new DerbyBodyWidgets().getRaceSelectionBody(flist),
       floatingActionButton: new FloatingActionButton(
         onPressed: ()=>{},
         tooltip: 'Increment',
         child: new Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+  static loadAndPush(BuildContext context, [String s3BucketName="https://s3.amazonaws.com/all.derby.rr1.us"]) async {
+    var flist=await new GetS3Object().getS3BucketList(s3BucketName);
+
+    print("loadAndPush: "+flist.toString());
+    Navigator.push(context,
+        new MaterialPageRoute(builder: (context) => new RaceSelection2(flist:flist)));
   }
 }

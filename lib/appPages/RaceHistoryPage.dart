@@ -5,10 +5,10 @@ import '../DerbyNavDrawer.dart';
 import '../derbyBodyWidgets.dart';
 import '../testData.dart';
 
-class RacerHome extends StatelessWidget {
+class RaceHistoryPage extends StatelessWidget {
   final String title;
   final List<Racer> racerList;
-  RacerHome({this.title="Racers", this.racerList});
+  RaceHistoryPage({this.title="Race History", this.racerList});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class RacerHome extends StatelessWidget {
         title: new Text(title),
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
-      body: new DerbyBodyWidgets().getRacerListBody(racerList),
+      body: new DerbyBodyWidgets().getRaceHistoryBody(),
       floatingActionButton: new FloatingActionButton(
         onPressed: ()=>{},
         tooltip: 'Increment',

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'models.dart';
 import 'widgets/RaceResultWidget.dart';
 import 'widgets/RacerWidget.dart';
-import 'widgets/ChartListWidget.dart';
+import 'widgets/RaceSelectionWidget.dart';
 import 'DerbyNavDrawer.dart';
 import 'testData.dart';
 
@@ -92,8 +92,8 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getChartListBody(Map<String, String> flist) {
-    var chartWidgetList = new List<Widget>();
+  Widget getRaceSelectionBody(Map<String, String> flist) {
+    var raceSelectionList = new List<Widget>();
 
     int x = 0;
     List<String> keys=flist.keys.toList();
@@ -102,14 +102,14 @@ class DerbyBodyWidgets {
     for (var displayFile in keys) {
       Color bg = x % 2 == 0 ? Colors.grey : null;
       x++;
-      chartWidgetList.add(new ChartListWidget(
+      raceSelectionList.add(new RaceSelectionWidget(
         displayFile: displayFile,
         fullPath: flist[displayFile],
         bgColor: bg,
       ));
     }
     return new ListView(
-      children: chartWidgetList,
+      children: raceSelectionList,
     );
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'appPages/RaceHistoryPage.dart';
 import 'testData.dart';
 import 'appPages/RacerApp.dart';
-import 'appPages/RaceHistoryApp.dart';
-import 'appPages/RaceSelectionApp.dart';
+import 'appPages/RaceSelection2.dart';
 import 'models.dart';
 import 'main.dart';
-import 'appPages/tab2.dart';
+import 'appPages/TabbedBracket.dart';
 
 class DerbyNavDrawer {
   static Drawer getDrawer(BuildContext context) {
@@ -30,7 +30,7 @@ class DerbyNavDrawer {
               Navigator.push(
                   context,
                   new MaterialPageRoute(
-                      builder: (context) => new RaceHistoryApp()));
+                      builder: (context) => new RaceHistoryPage()));
             },
           ),
           new ListTile(
@@ -38,24 +38,28 @@ class DerbyNavDrawer {
             onTap: () {
               var racerList=new TestData().getTestRacers();
               Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new RacerApp(racerList: racerList)));
+                  new MaterialPageRoute(builder: (context) => new RacerHome(racerList: racerList)));
             },
           ),
           new ListTile(
             title: new Text('Race Selection'),
             onTap: () {
 
-              RaceSelectionApp.loadAndPush(context);
+              RaceSelection2.loadAndPush(context);
             },
           ),
           new ListTile(
             title: new Text('Bracket with Tabs'),
             onTap: () {
 
+              var foo=[];
+              for(int x=0;x<50;x++){
+                foo.add(new TestData().getRbd());
+              }
               RaceBracketDetail rbd=new TestData().getRbd();
 
               Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new TabBarDemo(rbd)));
+                  new MaterialPageRoute(builder: (context) => new TabbedBracket(rbd)));
               //Navigator.pop(context);
             },
           ),

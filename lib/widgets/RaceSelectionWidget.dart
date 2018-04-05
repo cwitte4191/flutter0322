@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import '../appPages/RaceSelection2.dart';
 import '../models.dart';
 import '../network/GetS3Object.dart';
-class ChartListWidget extends StatelessWidget {
+
+class RaceSelectionWidget extends StatelessWidget {
   final double f1 = 1.8;
   final String displayFile;
   final String fullPath;
   final Color bgColor;
-  ChartListWidget({Key, key, this.displayFile, this.fullPath, this.bgColor})
+  RaceSelectionWidget({Key, key, this.displayFile, this.fullPath, this.bgColor})
       : assert(displayFile != null),
         assert(fullPath != null),
         super(key: key) {}
@@ -18,8 +20,8 @@ class ChartListWidget extends StatelessWidget {
     print("trucateDf: ${truncateDf}");
     return new GestureDetector(
         onTap: () {
-          print("Tapped: ${fullPath}");
-          new GetS3Object().getS3Object(fullPath);
+
+          handleTap(context);
         },
         child: new Container(
             color: bgColor,
@@ -33,4 +35,20 @@ class ChartListWidget extends StatelessWidget {
               ],
             )));
   }
+  void handleTap (BuildContext context) async{
+    print("Tapped: ${fullPath}");
+    String  response=await new GetS3Object().getS3ObjectAsString(fullPath);
+    RaceConfig raceConfig= RaceConfig.fromXml(response);
+
+    if(raceConfig.applicationUrl.isEmpty){
+      print("Redisplaying list with bucket ${raceConfig.s3BucketUrlPrefix}");
+      RaceSelection2.loadAndPush(context,raceConfig.s3BucketUrlPrefix);
+    }
+    else{
+      String  derbyXml=await new GetS3Object().getS3ObjectAsFile("${raceConfig.s3BucketUrlPrefix}/derby.00000.gz");
+
+      print ("got gzip: "+derbyXml.length.toString());
+    }
+  }
+
 }

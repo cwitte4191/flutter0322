@@ -90,7 +90,9 @@ static final RegExp regexNum= new RegExp(r"(\d+)");
             new Padding(
             padding: const EdgeInsets.all(16.0),
             child:
-            new Text(placeIconText.group(0),textScaleFactor: 4.0)));
+            new Text(placeIconText.group(0),
+                textScaleFactor: 4.0,
+                style: new TextStyle(fontWeight: FontWeight.bold))));
       }
     }
     return;

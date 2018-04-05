@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import '../DerbyNavDrawer.dart';
 import '../widgets/RaceResultWidget.dart';
 import '../models.dart';
 
-class TabBarDemo extends StatelessWidget {
+class TabbedBracket extends StatelessWidget {
   int tabCount;
   final RaceBracketDetail raceBracketDetail;
   Map<String,List<DisplayableRace>> heatDetailByRound;
 
-  TabBarDemo(this.raceBracketDetail) {
+  TabbedBracket(this.raceBracketDetail) {
     heatDetailByRound = raceBracketDetail.getDisplayableRaceByRound();
     print("tab demo:" + heatDetailByRound.toString());
     tabCount = heatDetailByRound.keys.length;
@@ -21,8 +22,8 @@ class TabBarDemo extends StatelessWidget {
 
       tabBarViews.add(_getTabContent(heatDetailByRound[hd]));
     }
-    return new MaterialApp(
-      home: new DefaultTabController(
+    return
+       new DefaultTabController(
         length: tabCount,
         child: new Scaffold(
           appBar: new AppBar(
@@ -31,11 +32,13 @@ class TabBarDemo extends StatelessWidget {
             ),
             title: new Text(raceBracketDetail.raceTitle),
           ),
+          drawer: DerbyNavDrawer.getDrawer(context),
+
           body: new TabBarView(
             children: tabBarViews,
           ),
         ),
-      ),
+
     );
   }
   Widget _getTabContent(List<DisplayableRace> drList){
