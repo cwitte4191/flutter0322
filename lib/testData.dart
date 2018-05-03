@@ -1,15 +1,14 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'models.dart';
 class TestData{
-  List<Racer> getTestRacers(){
-    var rc=new List<Racer>();
+  Map<int,Racer> getTestRacers(){
+    var rc=new SplayTreeMap<int,Racer>();
     for(var x=0;x<1000;x++){
-      rc.add(new Racer()..carNumber=x..racerName=x.toString()+" "+x.toString()+":"+x.toString());
+      rc[x]=new Racer()..carNumber=x..racerName=x.toString()+" "+x.toString()+":"+x.toString();
     }
-    for(var racer in rc){
-      //print(JSON.encode(racer));
-    }
+
 
     return rc;
   }

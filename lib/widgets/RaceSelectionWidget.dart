@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import '../appPages/RacerApp.dart';
 import '../appPages/RaceSelection2.dart';
 import '../models.dart';
 import '../network/GetS3Object.dart';
-
+import '../globals.dart' as globals;
 class RaceSelectionWidget extends StatelessWidget {
   final double f1 = 1.8;
   final String displayFile;
@@ -35,7 +39,21 @@ class RaceSelectionWidget extends StatelessWidget {
               ],
             )));
   }
+
   void handleTap (BuildContext context) async{
+    Map<String, Racer>racerModelMap=new Map();
+    void parseJsonLine(String line){
+      print("parse input: ${line}")
+          ;
+      return;
+      var racerMap= JSON.decode(line);
+
+      Racer r=new Racer.fromJsonMap(racerMap);
+
+
+      print("parsed as ${r.toJson()}");
+
+    }
     print("Tapped: ${fullPath}");
     String  response=await new GetS3Object().getS3ObjectAsString(fullPath);
     RaceConfig raceConfig= RaceConfig.fromXml(response);
@@ -45,9 +63,15 @@ class RaceSelectionWidget extends StatelessWidget {
       RaceSelection2.loadAndPush(context,raceConfig.s3BucketUrlPrefix);
     }
     else{
-      String  derbyXml=await new GetS3Object().getS3ObjectAsFile("${raceConfig.s3BucketUrlPrefix}/derby.00000.gz");
+      // new GetS3Object().getS3ObjectAsFile("${raceConfig.s3BucketUrlPrefix}/derby.00000.gz",localBasename: "00000");
 
-      print ("got gzip: "+derbyXml.length.toString());
+      globals.raceConfig=raceConfig;
+      Map<int,Racer> racerMap=await new RefreshData().doRefresh( "Racer",raceConfig: raceConfig);
+       Navigator.push(context,
+           new MaterialPageRoute(builder: (context) => new RacerHome(racerMap: racerMap)));
+      // .forEach(parseJsonLine);
+
+      //print ("got gzip: "+derbyXml.length.toString());
     }
   }
 

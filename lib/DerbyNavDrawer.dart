@@ -36,9 +36,9 @@ class DerbyNavDrawer {
           new ListTile(
             title: new Text('Racers'),
             onTap: () {
-              var racerList=new TestData().getTestRacers();
+              var racerMap=new TestData().getTestRacers();
               Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new RacerHome(racerList: racerList)));
+                  new MaterialPageRoute(builder: (context) => new RacerHome(racerMap: racerMap)));
             },
           ),
           new ListTile(

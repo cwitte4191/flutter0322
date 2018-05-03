@@ -7,12 +7,21 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  wilt: "^3.4.1"
+  #wilt: "^3.4.1"
+  #wilt: any
+  mqtt_client: "^1.7.1"
+  # mqtt_client: 
+  #    path: /Users/cwitte/scratch/mqtt_client
+  archive: "^1.0.33"
+  path: "^1.5.1"
+  #protobuf: ">=0.3.4 <0.4.0"
+  dson: "any"
+
   #path_provider: "^0.4.0"
   cupertino_icons: "^0.1.0"
   json_object: "^1.0.19"
   xml: "^3.0.0"
-  cached_network_image: "^0.3.0"
+  cached_network_image: "^0.4.1"
   pubsub: "^1.1.9"
 
   #wilt:

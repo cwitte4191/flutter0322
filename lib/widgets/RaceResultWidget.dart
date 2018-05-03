@@ -58,8 +58,9 @@ class RaceResultWidget extends StatelessWidget {
         image: new AssetImage("images/finish_flag.png"));
   }
 
-  getChildTableRows(DisplayableRace displayableRace, Map driverMap) {
-    var rc = [];
+  List<TableRow> getChildTableRows(DisplayableRace displayableRace, Map driverMap) {
+    var rc = new List<TableRow>();
+
     if (displayableRace.getRaceMetaData().chartPosition != null) {
       rc.add(new TableRow(children: <Widget>[
         new Text(""),
@@ -76,6 +77,7 @@ class RaceResultWidget extends StatelessWidget {
       if(iconWidget==null){
         iconWidget=new Text("");
       }
+
       //print("raceEntry car:"+raceEntry.carNumber.toString());
       //print("raceEntry driver:"+driverMap.values.toString());
       //print("raceEntry driver:"+driverName);
@@ -83,10 +85,13 @@ class RaceResultWidget extends StatelessWidget {
       rc.add(new TableRow(children: <Widget>[
         //new Text("foo"),
         iconWidget,
+
+
         new DriverResultWidget(
             driverName: driverMap[carNumber],
             carNumber: carNumber,
             supplementalText: resultsSummary.getMessages(carNumber))
+
       ]));
     }
     return rc;
@@ -133,7 +138,8 @@ class DriverResultWidget extends StatelessWidget {
       safeCarNumber = "Bye";
     }
 
-    var rowWidgets = [];
+    //var rowWidgets=[];  //This used to work?!?!?
+    List<Widget> rowWidgets = [];
     rowWidgets.add(new Row(children: <Widget>[
       new Text(
         safeCarNumber,

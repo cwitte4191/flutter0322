@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../network/GetS3Object.dart';
 import '../models.dart';
 import '../widgets/RaceResultWidget.dart';
 import '../DerbyNavDrawer.dart';
@@ -18,11 +19,21 @@ class RaceHistoryPage extends StatelessWidget {
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
       body: new DerbyBodyWidgets().getRaceHistoryBody(),
+       // body: new Text("foo"),
       floatingActionButton: new FloatingActionButton(
-        onPressed: ()=>{},
+        onPressed: ()=>          requestRefresh(context)
+        ,
         tooltip: 'Increment',
         child: new Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+  void requestRefresh(BuildContext context) async{
+    Map<int,RacePhase> racerMap=await new RefreshData().doRefresh( "RacePhase");
+
+    print("RacePhase reload size: "+racerMap.length.toString());
+    //TODO: change constructor
+    Navigator.push(context,
+        new MaterialPageRoute(builder: (context) => new RaceHistoryPage(racerList: null)));
   }
 }

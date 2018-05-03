@@ -23,17 +23,18 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getRacerListBody(List<Racer> racers) {
+  Widget getRacerListBody(Map<int,Racer> racers) {
     var racerWidgetList = new List<Widget>();
-
-    for (var x = 0; x < racers.length; x++) {
-      var racer = racers[x];
-      Color bg = x % 2 == 0 ? Colors.grey : null;
+    int rowNum=0;
+    void add1Racer(int key, Racer racer) {
+      Color bg = rowNum++ % 2 == 0 ? Colors.grey : null;
       racerWidgetList.add(new RacerWidget(
         racer: racer,
         bgColor: bg,
       ));
     }
+
+    racers.forEach(add1Racer);
 
     return new ListView(
       children: racerWidgetList,
@@ -41,6 +42,8 @@ class DerbyBodyWidgets {
   }
 
   Widget getRaceHistoryBody() {
+    print("getRaceHistoryBody begin: ");
+
     var raceStanding = new RaceStanding(car1: 110, car2: 111);
 
     raceStanding.phase2DeleaMS = 200;
@@ -87,6 +90,9 @@ class DerbyBodyWidgets {
 
       if (rrw != null) rpList.add(rrw);
     }
+    //print("racePhase history: $rpList");
+    print("getRaceHistoryBody done: "+rpList.length.toString());
+
     return new ListView(
       children: rpList,
     );
@@ -97,7 +103,7 @@ class DerbyBodyWidgets {
 
     int x = 0;
     List<String> keys=flist.keys.toList();
-    keys.sort((a, b) => a.compareTo(b) * -1);
+    keys.sort((a, b) => a.compareTo(b) * 1);
 
     for (var displayFile in keys) {
       Color bg = x % 2 == 0 ? Colors.grey : null;
@@ -112,4 +118,6 @@ class DerbyBodyWidgets {
       children: raceSelectionList,
     );
   }
+
+
 }

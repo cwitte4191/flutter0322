@@ -1,6 +1,6 @@
 part of models;
 
-class Racer {
+class Racer implements HasJsonMap {
   String racerName;
   int carNumber;
 
@@ -16,7 +16,12 @@ class Racer {
   }
   @override
   Map toJson(){
-    return {racerName: racerName, carNumber:carNumber};
+    return {"racerName": racerName, "carNumber":carNumber};
   }
+  Racer(){}
 
+  Racer.fromJsonMap(Map jsonMap){
+    this.racerName = jsonMap["firstName"];
+    this.carNumber = jsonMap["carNumber"];
+  }
 }

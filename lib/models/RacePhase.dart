@@ -11,6 +11,31 @@ class RacePhase implements DisplayableRace {
     return phaseNumber == 1 ? "A" : "B";
   }
 
+  RacePhase(){
+
+  }
+  RacePhase.fromJsonMap(Map jsonMap){
+    this.loadMs = jsonMap["loadMS"];
+    this.phaseNumber = jsonMap["phaseNumber"];
+    this.raceStandingID=jsonMap["raceStandingID"];
+    this.id=jsonMap["id"];
+    int resultMS=jsonMap["resultMS"];
+    int lane1ResultMS=null;
+    int lane2ResultMS=null;
+    if(resultMS!=null){
+      if(resultMS >0){
+        lane1ResultMS=0;
+        lane2ResultMS=resultMS;
+      }
+      else{
+        lane1ResultMS=resultMS.abs();
+        lane2ResultMS=0;
+      }
+    }
+    raceEntries[jsonMap["carNumber"]]=new RaceEntry(carNumber:jsonMap["carNumber1"], lane:1, resultMS: lane1ResultMS);
+    raceEntries[jsonMap["carNumber"]]=new RaceEntry(carNumber:jsonMap["carNumber2"], lane:2, resultMS: lane2ResultMS);
+
+  }
   List<RaceEntry> getSortedRaceEntries() {
     var rc = raceEntries.values.toList();
 
