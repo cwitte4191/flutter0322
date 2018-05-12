@@ -15,13 +15,13 @@ dependencies:
   archive: "^1.0.33"
   path: "^1.5.1"
   #protobuf: ">=0.3.4 <0.4.0"
-  dson: "any"
+  #dson: "any"
 
   #path_provider: "^0.4.0"
   cupertino_icons: "^0.1.0"
   json_object: "^1.0.19"
   xml: "^3.0.0"
-  cached_network_image: "^0.4.1"
+  cached_network_image: "^0.4.1+1"
   pubsub: "^1.1.9"
 
   #wilt:

@@ -1,4 +1,5 @@
 part of models;
+
 class RacePhase implements DisplayableRace {
   int id;
   final raceEntries = new Map<int, RaceEntry>();
@@ -11,34 +12,34 @@ class RacePhase implements DisplayableRace {
     return phaseNumber == 1 ? "A" : "B";
   }
 
-  RacePhase(){
-
-  }
-  RacePhase.fromJsonMap(Map jsonMap){
+  RacePhase() {}
+  RacePhase.fromJsonMap(Map jsonMap) {
     this.loadMs = jsonMap["loadMS"];
     this.phaseNumber = jsonMap["phaseNumber"];
-    this.raceStandingID=jsonMap["raceStandingID"];
-    this.id=jsonMap["id"];
-    int resultMS=jsonMap["resultMS"];
-    int lane1ResultMS=null;
-    int lane2ResultMS=null;
-    if(resultMS!=null){
-      if(resultMS >0){
-        lane1ResultMS=0;
-        lane2ResultMS=resultMS;
-      }
-      else{
-        lane1ResultMS=resultMS.abs();
-        lane2ResultMS=0;
+    this.raceStandingID = jsonMap["raceStandingID"];
+    this.id = jsonMap["id"];
+    int resultMS = jsonMap["resultMS"];
+    int lane1ResultMS = null;
+    int lane2ResultMS = null;
+    if (resultMS != null) {
+      if (resultMS > 0) {
+        lane1ResultMS = 0;
+        lane2ResultMS = resultMS;
+      } else {
+        lane1ResultMS = resultMS.abs();
+        lane2ResultMS = 0;
       }
     }
-    raceEntries[jsonMap["carNumber"]]=new RaceEntry(carNumber:jsonMap["carNumber1"], lane:1, resultMS: lane1ResultMS);
-    raceEntries[jsonMap["carNumber"]]=new RaceEntry(carNumber:jsonMap["carNumber2"], lane:2, resultMS: lane2ResultMS);
-
+    raceEntries[jsonMap["carNumber1"]] = new RaceEntry(
+        carNumber: jsonMap["carNumber1"], lane: 1, resultMS: lane1ResultMS);
+    raceEntries[jsonMap["carNumber2"]] = new RaceEntry(
+        carNumber: jsonMap["carNumber2"], lane: 2, resultMS: lane2ResultMS);
   }
   List<RaceEntry> getSortedRaceEntries() {
     var rc = raceEntries.values.toList();
-
+    if (rc[0].resultMS == null || rc[1].resultMS == null) {
+      return rc;
+    }
     rc.sort((a, b) => a.resultMS.compareTo(b.resultMS));
 
     return rc;
@@ -65,6 +66,8 @@ class RacePhase implements DisplayableRace {
     var sortedEntries = getSortedRaceEntries();
     RaceEntry winner = sortedEntries[0];
     RaceEntry place2 = sortedEntries[1];
+    if (winner.resultMS == null) return;
+
     int winningMS = place2.resultMS - winner.resultMS;
     String phase = getPhaseLetter();
     if (winningMS == 0) {
@@ -73,7 +76,8 @@ class RacePhase implements DisplayableRace {
     } else {
       resultsSummary.addMessage(
           winner.carNumber, "Phase ${phase}: ${winningMS}MS");
-      resultsSummary.setIcon(winner.carNumber, RaceResultWidget.getFinishFlagWidget());
+      resultsSummary.setIcon(
+          winner.carNumber, RaceResultWidget.getFinishFlagWidget());
     }
   }
 
@@ -84,7 +88,9 @@ class RacePhase implements DisplayableRace {
 
   @override
   RaceMetaData getRaceMetaData() {
-    return new RaceMetaData(raceUpdateTime: this.startMs.toString(),);
+    return new RaceMetaData(
+      raceUpdateTime: this.startMs.toString(),
+    );
   }
 }
 

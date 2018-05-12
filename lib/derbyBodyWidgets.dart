@@ -9,7 +9,7 @@ import 'testData.dart';
 class DerbyBodyWidgets {
   Widget getBody() {
     new TestData().getRbd();
-    return getRaceHistoryBody();
+    return getTestDataRaceHistoryBody();
     //return getRacerListBody();
   }
 
@@ -23,9 +23,9 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getRacerListBody(Map<int,Racer> racers) {
+  Widget getRacerListBody(Map<int, Racer> racers) {
     var racerWidgetList = new List<Widget>();
-    int rowNum=0;
+    int rowNum = 0;
     void add1Racer(int key, Racer racer) {
       Color bg = rowNum++ % 2 == 0 ? Colors.grey : null;
       racerWidgetList.add(new RacerWidget(
@@ -41,8 +41,27 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getRaceHistoryBody() {
-    print("getRaceHistoryBody begin: ");
+  Widget getRaceHistoryBody(Map<int, RacePhase> phaseMap) {
+    print("getRaceHistoryBody: begin");
+
+    var rpList = new List<Widget>();
+    final Map<int, String> driverMap = new Map();
+    void add1Widget(int key, RacePhase racePhase) {
+      RaceResultWidget rrw=new RaceResultWidget(
+          displayableRace: racePhase, driverMap: driverMap);
+      print("rrw: $rrw");
+      //rpList.add(rrw);
+      rpList.insert(0, rrw); // reverse so most recent is on top
+    }
+
+    phaseMap.forEach(add1Widget);
+    return new ListView(
+      children: rpList,
+    );
+  }
+
+  Widget getTestDataRaceHistoryBody() {
+    print("getRaceHistoryBody begin (test): ");
 
     var raceStanding = new RaceStanding(car1: 110, car2: 111);
 
@@ -91,7 +110,7 @@ class DerbyBodyWidgets {
       if (rrw != null) rpList.add(rrw);
     }
     //print("racePhase history: $rpList");
-    print("getRaceHistoryBody done: "+rpList.length.toString());
+    print("getRaceHistoryBody done: " + rpList.length.toString());
 
     return new ListView(
       children: rpList,
@@ -102,7 +121,7 @@ class DerbyBodyWidgets {
     var raceSelectionList = new List<Widget>();
 
     int x = 0;
-    List<String> keys=flist.keys.toList();
+    List<String> keys = flist.keys.toList();
     keys.sort((a, b) => a.compareTo(b) * 1);
 
     for (var displayFile in keys) {
@@ -118,6 +137,4 @@ class DerbyBodyWidgets {
       children: raceSelectionList,
     );
   }
-
-
 }

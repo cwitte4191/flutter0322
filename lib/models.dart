@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'widgets/RaceResultWidget.dart';
-import 'package:dson/dson.dart';
 
 part 'models/racer.dart';
 part 'models/RaceBracketDetail.dart';

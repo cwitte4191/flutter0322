@@ -158,48 +158,121 @@ class RefreshData {
         "${raceConfig.s3BucketUrlPrefix}/dataLog.ndjson",
         localBasename: "dataLog.ndjson");
 
+    print("doRefresh begin: " + serializedName);
     print(" ndjson: ${ndjson}");
+    /*
     print("File content: " + " ${await(ndjson.readAsString(encoding: ASCII))}");
+
 
     var lines = await ndjson
         .openRead()
         .transform(new Utf8Decoder())
         .transform(const LineSplitter());
+        */
+    print("File content: " + " ${await(ndjson.readAsString(encoding: ASCII))}");
+
+    Stream<List<int>> inputStream = ndjson.openRead();
+    int accumulatedBytes=0;
+
+    inputStream
+        .transform(new Utf8Decoder())
+        .transform(new LineSplitter())
+        .listen((String line) {
+      // Process results.
+      accumulatedBytes+=line.length;
+
+      print('streamLine: ${line.length} acc: ${accumulatedBytes} bytes:  $line:');
+    }, onDone: () {
+      print('File is now closed.');
+    }, onError: (e) {
+      print("Stream error: "+e.toString());
+    });
+    ;
     print(" begin await: ${ndjson}");
     print(" begin await Type T:");
+    print(" begin: sleep.");
 
+    await sleep2();
+    print(" done: sleep.");
+
+    int count = 0;
     SplayTreeMap<int, T> rcMap = new SplayTreeMap();
+
+    /*
     await for (var line in lines) {
-      print("line:" + line);
-      var foo = JSON.decode(line);
-      print("sn:" + foo["sn"]);
-      if (foo["sn"] != serializedName) {
-        continue;
-      }
+      count++;
+      print("line:" + count.toString() + " " + line);
+      continue; //TODO: wip to see why we error.
+      parseLine(line,serializedName,rcMap);
 
-      if(serializedName=="Racer") {
-        Racer r = new Racer.fromJsonMap(foo["data"]);
-        //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-        if (foo["type"] == "Remove") {
-          rcMap.remove(r.carNumber);
-        } else {
-          rcMap[r.carNumber] = (r as T);
-        }
-      }
-
-      if(serializedName=="RacePhase") {
-        RacePhase r = new RacePhase.fromJsonMap(foo["data"]);
-        //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-        if (foo["type"] == "Remove") {
-          rcMap.remove(r.id);
-        } else {
-          rcMap[r.id] = (r as T);
-        }
-      }
     }
-    print(" done2 await: ${ndjson}");
+    */
+    print("doRefresh: done2 await: ${ndjson} map size: " +
+        rcMap.length.toString());
 
     return rcMap;
+  }
+
+  Future sleep2() {
+    return new Future.delayed(const Duration(seconds: 2), () => "2");
+  }
+  void parseLine<T>(String line, String serializedName, Map<int,T>rcMap){
+
+    var foo = JSON.decode(line);
+    print("sn:" + foo["sn"]);
+    if (foo["sn"] != serializedName) {
+      return;
+    }
+
+    if (serializedName == "Racer") {
+      Racer r = new Racer.fromJsonMap(foo["data"]);
+      //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
+      if (foo["type"] == "Remove") {
+        rcMap.remove(r.carNumber);
+      } else {
+        rcMap[r.carNumber] = (r as T);
+      }
+    }
+
+    if (serializedName == "RacePhase") {
+      RacePhase r = new RacePhase.fromJsonMap(foo["data"]);
+      //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
+      if (foo["type"] == "Remove") {
+        rcMap.remove(r.id);
+      } else {
+        rcMap[r.id] = (r as T);
+      }
+    }
+  }
+  /*
+  void setStateFoo(VoidCallback fn) {
+    print("setState list size prior:" + list.length.toString());
+    fn();
+    print("setState list size post:" + list.length.toString());
+  }
+
+  List<Racer> list = [];
+  void streamFrom() {
+    StreamController<Racer> streamController = new StreamController.broadcast();
+    streamController.stream.listen((p) => setStateFoo(() => list.add(p)));
+    load(streamController);
+  }
+  */
+
+  void load(StreamController<Racer> sc) async {
+    String url = "";
+    var client = new HttpClient();
+    var uri = new Uri().resolve(url);
+    var request = await client.getUrl(uri);
+    //request.
+    var streamedResponse = await request.close();
+    streamedResponse
+        .transform(new Utf8Decoder())
+        .transform(json.decoder)
+        .expand((e) => e)
+        .map((map) => Racer.fromJsonMap(map))
+        .pipe(sc);
+    ;
   }
 }
 

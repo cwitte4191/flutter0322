@@ -8,18 +8,25 @@ import '../testData.dart';
 
 class RaceHistoryPage extends StatelessWidget {
   final String title;
-  final List<Racer> racerList;
-  RaceHistoryPage({this.title="Race History", this.racerList});
+  final Map<int,RacePhase> raceMap;
+  RaceHistoryPage({this.title="Race History", this.raceMap});
 
   @override
   Widget build(BuildContext context) {
+    print("RaceHistoryPage build: $raceMap");
+    Widget bodyWidgets;
+    if(raceMap==null){
+      bodyWidgets=new DerbyBodyWidgets().getTestDataRaceHistoryBody();
+    }
+    else{
+      bodyWidgets=new DerbyBodyWidgets().getRaceHistoryBody(raceMap);
+    }
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(title),
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
-      body: new DerbyBodyWidgets().getRaceHistoryBody(),
-       // body: new Text("foo"),
+      body: bodyWidgets,
       floatingActionButton: new FloatingActionButton(
         onPressed: ()=>          requestRefresh(context)
         ,
@@ -34,6 +41,6 @@ class RaceHistoryPage extends StatelessWidget {
     print("RacePhase reload size: "+racerMap.length.toString());
     //TODO: change constructor
     Navigator.push(context,
-        new MaterialPageRoute(builder: (context) => new RaceHistoryPage(racerList: null)));
+        new MaterialPageRoute(builder: (context) => new RaceHistoryPage(raceMap: racerMap)));
   }
 }

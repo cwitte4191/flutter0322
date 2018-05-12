@@ -5,6 +5,8 @@ import 'widgets/RaceSelectionWidget.dart';
 import 'network/GetS3Object.dart';
 import 'appPages/RaceHistoryPage.dart';
 import 'dart:async';
+import 'globals.dart' as globals;
+
 //import 'mqtt.dart';
 //import 'package:pubsub/pubsub.dart';
 
@@ -19,6 +21,12 @@ void main() {
   */
       //runApp(new RaceHistoryApp());
   var racerMap=new TestData().getTestRacers();
+  Widget homeWidget=null;
+  if(globals.raceConfig==null){
+    homeWidget=null;
+
+  }
+
 
   runApp( new MaterialApp(
       title: 'Flutter Demo',

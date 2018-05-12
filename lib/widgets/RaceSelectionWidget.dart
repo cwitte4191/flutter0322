@@ -39,7 +39,16 @@ class RaceSelectionWidget extends StatelessWidget {
               ],
             )));
   }
+  void _onLoading(BuildContext context){
+    showDialog(
+        context: context,
+        child: new Dialog(
+            child: new Row(mainAxisSize: MainAxisSize.min,
+              children: <Widget>[new CircularProgressIndicator(), new Text("Loading")],)
+        )
+    );
 
+  }
   void handleTap (BuildContext context) async{
     Map<String, Racer>racerModelMap=new Map();
     void parseJsonLine(String line){
@@ -55,6 +64,7 @@ class RaceSelectionWidget extends StatelessWidget {
 
     }
     print("Tapped: ${fullPath}");
+    _onLoading(context);
     String  response=await new GetS3Object().getS3ObjectAsString(fullPath);
     RaceConfig raceConfig= RaceConfig.fromXml(response);
 
@@ -74,5 +84,6 @@ class RaceSelectionWidget extends StatelessWidget {
       //print ("got gzip: "+derbyXml.length.toString());
     }
   }
+
 
 }
