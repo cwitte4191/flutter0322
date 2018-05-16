@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../network/GetS3Object.dart';
-import '../models.dart';
-import '../widgets/RaceResultWidget.dart';
-import '../DerbyNavDrawer.dart';
-import '../derbyBodyWidgets.dart';
-import '../testData.dart';
+import 'package:flutter0322/DerbyNavDrawer.dart';
+import 'package:flutter0322/derbyBodyWidgets.dart';
+
 import 'dart:async';
 import 'dart:math';
+
+import 'package:flutter0322/models.dart';
+import 'package:flutter0322/network/GetS3Object.dart';
 class RacerHome extends StatelessWidget {
   final String title;
   BuildContext lastContext;

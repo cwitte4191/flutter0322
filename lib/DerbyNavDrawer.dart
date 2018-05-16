@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'appPages/RaceHistoryPage.dart';
-import 'testData.dart';
-import 'appPages/RacerApp.dart';
-import 'appPages/RaceSelection2.dart';
-import 'models.dart';
-import 'main.dart';
-import 'appPages/TabbedBracket.dart';
+import 'package:flutter0322/appPages/BracketList.dart';
+import 'package:flutter0322/appPages/RaceHistoryPage.dart';
+import 'package:flutter0322/appPages/RaceSelection2.dart';
+import 'package:flutter0322/appPages/RacerApp.dart';
+import 'package:flutter0322/appPages/TabbedBracket.dart';
+import 'package:flutter0322/modelUi.dart';
+import 'package:flutter0322/models.dart';
+import 'package:flutter0322/network/GetS3Object.dart';
+import 'package:flutter0322/testData.dart';
+
+import 'package:flutter0322/globals.dart' as globals;
 
 class DerbyNavDrawer {
   static Drawer getDrawer(BuildContext context) {
-
     return new Drawer(
 // Add a ListView to the drawer. This ensures the user can scroll
 // through the options in the Drawer if there isn't enough vertical
@@ -26,46 +29,82 @@ class DerbyNavDrawer {
           ),
           new ListTile(
             title: new Text('Race Phases'),
-            onTap: () {
+            onTap: () async {
+              Map<int, RacePhase> phaseMap = null;
+              if (globals.globalDerby.raceConfig != null) {
+                phaseMap = await new RefreshData().doRefresh("RacePhase");
+              }
               Navigator.push(
                   context,
                   new MaterialPageRoute(
-                      builder: (context) => new RaceHistoryPage()));
+                      builder: (context) =>
+                          new RaceHistoryPage(racePhaseMap: phaseMap)));
+            },
+          ),
+          new ListTile(
+            title: new Text('Race Heats'),
+            onTap: () async {
+              Map<int, RaceStanding> standingMap = null;
+              if (globals.globalDerby.raceConfig != null) {
+                standingMap = await new RefreshData().doRefresh("RaceStanding");
+              }
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (context) =>
+                          new RaceHistoryPage(raceStandingMap: standingMap)));
             },
           ),
           new ListTile(
             title: new Text('Racers'),
-            onTap: () {
-              var racerMap=new TestData().getTestRacers();
-              Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new RacerHome(racerMap: racerMap)));
+            onTap: () async {
+              Map<int, Racer> racerMap = null;
+              if (globals.globalDerby.racerMap.length==0) {
+                racerMap = await new RefreshData().doRefresh("Racer");
+              } else {
+                racerMap=globals.globalDerby.racerMap;
+              }
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (context) => new RacerHome(racerMap: racerMap)));
             },
           ),
           new ListTile(
             title: new Text('Race Selection'),
             onTap: () {
-
               RaceSelection2.loadAndPush(context);
             },
           ),
+
           new ListTile(
-            title: new Text('Bracket with Tabs'),
-            onTap: () {
+            title: new Text('Brackets'),
+            onTap: () async {
+              Map<int, RaceBracket> bracketMap = null;
+              if (globals.globalDerby.raceConfig != null) {
+                if(globals.globalDerby.bracketMap.length==0) {
+                  print("Refreshing bracketMap");
 
-              var foo=[];
-              for(int x=0;x<50;x++){
-                foo.add(new TestData().getRbd());
+                  bracketMap = await new RefreshData().doRefresh("RaceBracket");
+                }
+                else{
+                  bracketMap=globals.globalDerby.bracketMap;
+                  print("Using cached bracketMap");
+
+                }
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(
+                        builder: (context) =>
+                            new BracketList(bracketMap: bracketMap)));
               }
-              RaceBracketDetail rbd=new TestData().getRbd();
-
-              Navigator.push(context,
-                  new MaterialPageRoute(builder: (context) => new TabbedBracket(rbd)));
-              //Navigator.pop(context);
+              else{
+                print("Null raceConfig, no brackets allowed");
+              }
             },
           ),
         ],
       ),
     );
   }
-
 }

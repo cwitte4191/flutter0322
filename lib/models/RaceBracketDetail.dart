@@ -1,6 +1,5 @@
 part of models;
 
-//import '../models.dart';
 
 class RaceBracketDetail{
   String raceTitle;
@@ -8,28 +7,7 @@ class RaceBracketDetail{
   final places=new SplayTreeMap<String,int> ();
   var heatDetailMap=new Map<String,HeatDetail>();
 
-  Map<String,List<DisplayableRace>> getDisplayableRaceByRound(){
-    var rc=new Map<String,List<DisplayableRace>> ();
-    void iterateMapEntry(String key, HeatDetail heatDetail) {
-      String round=heatDetail.raceDisposition.round;
 
-      if (rc[round] ==null) rc[round]=new List<HeatDetail>();
-      rc[round].add(heatDetail);
-
-    }
-    heatDetailMap.forEach(iterateMapEntry);
-
-    if(places !=null && places.length>0){
-      rc["Places"]=new List<DisplayableRace>();
-      for(String place in places.keys){
-        print ("Place:"+place);
-        print ("Place car:"+places[place].toString());
-        //rc["Places"].add(new DisplayablePlace(place: place,carNumber: 044));
-        rc["Places"].add(new DisplayablePlace(place: place,carNumber: places[place]));
-      }
-    }
-    return rc;
-  }
   RaceBracketDetail.fromJsonMap(Map jsonMap){
     this.raceTitle=jsonMap["raceTitle"];
     this.templateName=jsonMap["templateName"];
@@ -62,43 +40,13 @@ class RaceBracketDetail{
     }
   }
 }
-class DisplayablePlace implements DisplayableRace{
-  final String place;
-  final int carNumber;
-  DisplayablePlace({this.carNumber,this.place}):assert( carNumber!=null){
-
+class RaceDisposition{
+  String round;
+  String race;
+  String winDest;
+  String loseDest;
 }
-
-  @override
-  List<int> getCarNumbers() {
-    return new List<int>()
-    ..add(this.carNumber);
-  }
-
-  @override
-  RaceMetaData getRaceMetaData() {
-    return new RaceMetaData(chartPosition: this.place);
-  }
-static final RegExp regexNum= new RegExp(r"(\d+)");
-
-  @override
-  void getResultsSummary(ResultsSummary resultsSummary) {
-    if(this.carNumber !=null){
-      final Match placeIconText=regexNum.firstMatch(place);
-      if(placeIconText!=null) {
-        resultsSummary.setIcon(this.carNumber,
-            new Padding(
-            padding: const EdgeInsets.all(16.0),
-            child:
-            new Text(placeIconText.group(0),
-                textScaleFactor: 4.0,
-                style: new TextStyle(fontWeight: FontWeight.bold))));
-      }
-    }
-    return;
-  }
-}
-class HeatDetail implements DisplayableRace{
+class HeatDetail {
   int winner;
   String heatKey;
   RaceDisposition raceDisposition;
@@ -110,25 +58,5 @@ class HeatDetail implements DisplayableRace{
     return [carNumber1,carNumber2];
   }
 
-  @override
-  void getResultsSummary(ResultsSummary resultsSummary) {
 
-    if(winner !=null){
-      resultsSummary.setIcon(winner, RaceResultWidget.getFinishFlagWidget());
-    }
-    return;
-  }
-
-
-
-  @override
-  RaceMetaData getRaceMetaData() {
-    return new RaceMetaData(chartPosition: raceDisposition.round +":"+heatKey);
-  }
-}
-class RaceDisposition{
-  String round;
-  String race;
-  String winDest;
-  String loseDest;
 }

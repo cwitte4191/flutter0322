@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'appPages/RacerApp.dart';
-import 'testData.dart';
-import 'widgets/RaceSelectionWidget.dart';
-import 'network/GetS3Object.dart';
-import 'appPages/RaceHistoryPage.dart';
+import 'package:flutter0322/appPages/RacerApp.dart';
+import 'package:flutter0322/models.dart';
+
 import 'dart:async';
-import 'globals.dart' as globals;
+
+import 'package:flutter0322/testData.dart';
+import 'package:flutter0322/globals.dart' as globals;
+import 'package:flutter0322/widgets/RaceSelectionWidget.dart';
 
 //import 'mqtt.dart';
 //import 'package:pubsub/pubsub.dart';
@@ -20,9 +21,10 @@ void main() {
   new Timer.periodic(oneSec, handleTimeout);
   */
       //runApp(new RaceHistoryApp());
-  var racerMap=new TestData().getTestRacers();
+ // var racerMap=new TestData().getTestRacers();
+  Map<int,Racer> racerMap=new Map();
   Widget homeWidget=null;
-  if(globals.raceConfig==null){
+  if(globals.globalDerby.raceConfig==null){
     homeWidget=null;
 
   }
@@ -33,7 +35,8 @@ void main() {
       theme: new ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: new RacerHome(racerMap: racerMap),
+      home: //RaceSelectionWidget.getLoadingDialog()
+     new RacerHome(racerMap: racerMap),
     ));
   }
 

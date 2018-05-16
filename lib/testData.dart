@@ -1,7 +1,8 @@
 import 'dart:collection';
 import 'dart:convert';
 
-import 'models.dart';
+import 'package:flutter0322/models.dart';
+
 class TestData{
   Map<int,Racer> getTestRacers(){
     var rc=new SplayTreeMap<int,Racer>();

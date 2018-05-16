@@ -8,21 +8,8 @@ class RacePair {
   RacePair._internal(this.car1, this.car2)
       : key = "${car1}.${car2}",
         assert(car1 != car2){
-    print ("RacePair: $car1, $car2");
-    /*
-    var mapp=[{"1":1,"2":2,"3":3}];
-    print("mapp: ${mapp}");
-    String json=JSON.encode(this);
-    print("json: ${json}");
-    var foo=JSON.decode(json);
-    print ("decode: ${foo.toString()}");
-    print ("decode  type: ${foo.runtimeType.toString()}");
-    //print ("decode  type: ${foo[0].runtimeType.toString()}");
-    int c=foo['car1'];
-    print ("foo car1: ${c}");
-    //var data = new JsonObject.fromJsonString(json);
-    //print("decode2: ${data[car1]}");
-*/
+    //print ("RacePair: $car1, $car2");
+
   }
 
   factory RacePair(int c1, int c2) {

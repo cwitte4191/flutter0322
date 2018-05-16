@@ -2,12 +2,15 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 import 'dart:convert';
-import '../models.dart';
+import 'package:flutter0322/models.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:xml/xml/nodes/document.dart';
 import 'package:archive/archive.dart';
 import 'package:path/path.dart';
-import '../globals.dart' as globals;
+import 'package:flutter0322/globals.dart' as globals;
+
+import 'package:semaphore/semaphore.dart';
 
 class GetS3Object {
   Future<Map<String, String>> getS3BucketList(String targetUrl) async {
@@ -41,22 +44,26 @@ class GetS3Object {
     var request = await httpClient.getUrl(uri);
     var response = await request.close();
     var responseBody = await response.transform(UTF8.decoder).join();
-    print("gso response: " + responseBody);
+    // print("gso response: " + responseBody);
 
     return responseBody;
   }
 
   Future<String> get _localPath async {
-    //final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationDocumentsDirectory();
+    print("appDocuments: ${directory.path}");
+    return directory.path;
+    /*
     Directory dir = Directory.systemTemp;
     print("temp dir: " + dir.path);
 
     return dir.path;
+    */
   }
 
   Future<File> _localFile({prefix = "foo"}) async {
     final path = await _localPath;
-    return new File('$path/$prefix.foo');
+    return new File('$path/$prefix');
   }
 
   Future<File> writeCounter(int counter) async {
@@ -92,6 +99,25 @@ class GetS3Object {
     return fname;
   }
 
+  void foo1(String target) async {
+    await new HttpClient()
+        .getUrl(Uri.parse(target))
+        .then((HttpClientRequest request) => request.close())
+        .then(await (HttpClientResponse response) =>
+            response.pipe(new File('foo1.txt').openWrite()));
+  }
+
+  void foo2(String target) async {
+    HttpClientResponse response = await new HttpClient()
+        .getUrl(Uri.parse(target))
+        .then((HttpClientRequest request) => request.close());
+
+    print("foo2 hcr:" + response.toString());
+
+    await response.pipe(new File('foo2.txt').openWrite());
+    print("foo2 pipe: done");
+  }
+
   Future<File> getS3ObjectAsFile(String target,
       {String localBasename = "MissingF"}) async {
     File fname = await _localFile(prefix: localBasename);
@@ -101,23 +127,19 @@ class GetS3Object {
     print("Length of file before ${fname} is ${fstat.size}");
     //var sink1 = fname.openWrite();
     var httpStatus = -1;
-    await new HttpClient()
+    HttpClientResponse response = await new HttpClient()
         .getUrl(Uri.parse(target))
         .then((HttpClientRequest request) {
-          request.headers..add(HttpHeaders.CONTENT_TYPE, "text/plain");
-          return request;
-        })
-        .then((HttpClientRequest request) => request.close())
-        .then((HttpClientResponse response) {
-          httpStatus = response.statusCode;
-          print("Download in flight ${localBasename} status: $httpStatus");
+      request.headers..add(HttpHeaders.CONTENT_TYPE, "text/plain");
+      return request;
+    }).then((HttpClientRequest request) => request.close());
 
-          //response.pipe(sink1);
-          response.pipe(fname.openWrite());
-        });
+    await response.pipe(fname.openWrite());
+
     //await sink1.close();
     print("Download complete ${localBasename} status: $httpStatus");
-    print("Length of file after ${fname} is ${fstat.size}");
+    FileStat fstat2 = await FileStat.stat(fname.path);
+    print("Length of file after ${fname} is ${fstat2.size}");
 /*
     if (target.endsWith(".gz")) {
       print("Gzip decode begin s ${localBasename}");
@@ -151,52 +173,50 @@ class GetS3Object {
 class RefreshData {
   Future<Map<int, T>> doRefresh<T>(String serializedName,
       {RaceConfig raceConfig}) async {
+    GetS3Object gs30 = new GetS3Object();
     if (raceConfig == null) {
-      raceConfig = globals.raceConfig;
+      raceConfig = globals.globalDerby.raceConfig;
     }
-    File ndjson = await new GetS3Object().getS3ObjectAsFile(
-        "${raceConfig.s3BucketUrlPrefix}/dataLog.ndjson",
-        localBasename: "dataLog.ndjson");
+    List<int> ptime=new List();
+    ptime.add( DateTime.now().millisecondsSinceEpoch);
+    String url = "${raceConfig.s3BucketUrlPrefix}/dataLog.ndjson";
+
+    File ndjson =
+        await gs30.getS3ObjectAsFile(url, localBasename: "dataLog.ndjson");
+    ptime.add( DateTime.now().millisecondsSinceEpoch);
 
     print("doRefresh begin: " + serializedName);
     print(" ndjson: ${ndjson}");
-    /*
-    print("File content: " + " ${await(ndjson.readAsString(encoding: ASCII))}");
-
-
-    var lines = await ndjson
-        .openRead()
-        .transform(new Utf8Decoder())
-        .transform(const LineSplitter());
-        */
-    print("File content: " + " ${await(ndjson.readAsString(encoding: ASCII))}");
 
     Stream<List<int>> inputStream = ndjson.openRead();
-    int accumulatedBytes=0;
+    int accumulatedBytes = 0;
 
-    inputStream
+
+    bool stringFilter(String event) {
+      var q="\"";
+      var pattern = new RegExp("${q}sn${q}:${q}${serializedName}${q}");
+      return event.contains(pattern);
+    }
+
+    List<String> jj = await inputStream
         .transform(new Utf8Decoder())
         .transform(new LineSplitter())
-        .listen((String line) {
-      // Process results.
-      accumulatedBytes+=line.length;
-
-      print('streamLine: ${line.length} acc: ${accumulatedBytes} bytes:  $line:');
-    }, onDone: () {
-      print('File is now closed.');
-    }, onError: (e) {
-      print("Stream error: "+e.toString());
-    });
+        .where(stringFilter)
+        .toList();
     ;
-    print(" begin await: ${ndjson}");
-    print(" begin await Type T:");
-    print(" begin: sleep.");
+    ptime.add( DateTime.now().millisecondsSinceEpoch);
 
-    await sleep2();
-    print(" done: sleep.");
+
+    print("jj matching strings:" + jj.length.toString());
 
     int count = 0;
     SplayTreeMap<int, T> rcMap = new SplayTreeMap();
+
+    for (String line in jj) {
+      parseLine(line, serializedName, rcMap);
+    }
+    print("jj mapSize :" + rcMap.length.toString());
+    ptime.add( DateTime.now().millisecondsSinceEpoch);
 
     /*
     await for (var line in lines) {
@@ -207,17 +227,24 @@ class RefreshData {
 
     }
     */
+    if(serializedName=="Racer"){
+      globals.globalDerby.racerMap=rcMap as Map<int, Racer>;
+    }
+    if(serializedName=="RaceBracket"){
+      globals.globalDerby.bracketMap=rcMap as Map<int, RaceBracket>;
+    }
     print("doRefresh: done2 await: ${ndjson} map size: " +
         rcMap.length.toString());
 
+    var start=ptime[0];
+    for( var x in ptime){
+      print ("elapsed ptime: ${x - start}");
+    }
     return rcMap;
   }
 
-  Future sleep2() {
-    return new Future.delayed(const Duration(seconds: 2), () => "2");
-  }
-  void parseLine<T>(String line, String serializedName, Map<int,T>rcMap){
 
+  void parseLine<T>(String line, String serializedName, Map<int, T> rcMap) {
     var foo = JSON.decode(line);
     print("sn:" + foo["sn"]);
     if (foo["sn"] != serializedName) {
@@ -236,6 +263,31 @@ class RefreshData {
 
     if (serializedName == "RacePhase") {
       RacePhase r = new RacePhase.fromJsonMap(foo["data"]);
+      //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
+      if (foo["type"] == "Remove") {
+        rcMap.remove(r.id);
+      } else {
+        rcMap[r.id] = (r as T);
+      }
+    }
+    if (serializedName == "RaceStanding") {
+      RaceStanding r = new RaceStanding.fromJsonMap(foo["data"]);
+      //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
+      if (foo["type"] == "Remove") {
+        rcMap.remove(r.id);
+      } else {
+        rcMap[r.id] = (r as T);
+      }
+    }
+    if (serializedName == "RaceBracket") {
+      RaceBracket r = new RaceBracket.fromJsonMap(foo["data"]);
+
+      print ("Input racebracket:"+line);
+      print ("Parsed racebracket:"+r.id.toString());
+      print ("Parsed raceName:"+r.raceName);
+      if(r.id==null){ // happens on persist, ,not merge!?
+        return;
+      }
       //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
       if (foo["type"] == "Remove") {
         rcMap.remove(r.id);

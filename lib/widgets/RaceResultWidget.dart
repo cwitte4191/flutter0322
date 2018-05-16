@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import '../models.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter0322/modelUi.dart';
+import 'package:flutter0322/models.dart';
 
 class RaceResultWidget extends StatelessWidget {
   final double f1 = 1.8;
   final DisplayableRace displayableRace;
-  final Map<int, String> driverMap;
+  final TextStyle timeStyle=new TextStyle(color:Colors.blueGrey);
+
+  final Map<int, Racer> driverMap;
   RaceResultWidget({Key, key, this.displayableRace, this.driverMap})
       : assert(displayableRace != null),
         super(key: key) {}
@@ -52,26 +55,31 @@ class RaceResultWidget extends StatelessWidget {
 
   static Widget _getFixedFFWidget() {
     return new Image(
-        //width: 50.0,
-        //height: 50.0,
-        //fit: BoxFit.scaleDown,
+        width: 60.0,
+        height: 60.0,
+        fit: BoxFit.scaleDown,
         image: new AssetImage("images/finish_flag.png"));
   }
 
-  List<TableRow> getChildTableRows(DisplayableRace displayableRace, Map driverMap) {
+  List<TableRow> getChildTableRows(DisplayableRace displayableRace, Map<int,Racer> driverMap) {
     var rc = new List<TableRow>();
 
     if (displayableRace.getRaceMetaData().chartPosition != null) {
+      String cp=displayableRace.getRaceMetaData().chartPosition;
+      String rbn=displayableRace.getRaceMetaData().raceBracketName;
+      String updateTime=displayableRace.getRaceMetaData().raceUpdateTime;
+      updateTime=(updateTime==null)?"":updateTime;
+      rbn=(rbn==null)?"":rbn;
       rc.add(new TableRow(children: <Widget>[
-        new Text(""),
-        new Text(displayableRace.getRaceMetaData().chartPosition)
+        new Text("Heat: $cp $rbn"),
+        new Text(updateTime, style: timeStyle,)
       ]));
     }
     var resultsSummary = new ResultsSummary();
     displayableRace.getResultsSummary(resultsSummary);
 
     for (var carNumber in displayableRace.getCarNumbers()) {
-      var driverName = driverMap[carNumber];
+      var driverName = driverMap[carNumber]?.racerName;
 
       var iconWidget=resultsSummary.getIcon(carNumber);
       if(iconWidget==null){
@@ -88,7 +96,7 @@ class RaceResultWidget extends StatelessWidget {
 
 
         new DriverResultWidget(
-            driverName: driverMap[carNumber],
+            driverName: driverName,
             carNumber: carNumber,
             supplementalText: resultsSummary.getMessages(carNumber))
 

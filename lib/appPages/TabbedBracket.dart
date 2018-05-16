@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import '../DerbyNavDrawer.dart';
-import '../widgets/RaceResultWidget.dart';
-import '../models.dart';
+import 'package:flutter0322/DerbyNavDrawer.dart';
+import 'package:flutter0322/modelUi.dart';
+import 'package:flutter0322/models.dart';
+import 'package:flutter0322/widgets/RaceResultWidget.dart';
+import 'package:flutter0322/globals.dart' as globals;
+
 
 class TabbedBracket extends StatelessWidget {
   int tabCount;
-  final RaceBracketDetail raceBracketDetail;
+  final RaceBracketDetailUi raceBracketDetailUi;
   Map<String,List<DisplayableRace>> heatDetailByRound;
 
-  TabbedBracket(this.raceBracketDetail) {
-    heatDetailByRound = raceBracketDetail.getDisplayableRaceByRound();
+  TabbedBracket(this.raceBracketDetailUi) {
+    heatDetailByRound = raceBracketDetailUi.getDisplayableRaceByRound();
     print("tab demo:" + heatDetailByRound.toString());
     tabCount = heatDetailByRound.keys.length;
   }
@@ -30,7 +33,7 @@ class TabbedBracket extends StatelessWidget {
             bottom: new TabBar(
               tabs: tabBarWidgets,
             ),
-            title: new Text(raceBracketDetail.raceTitle),
+            title: new Text(raceBracketDetailUi.raceBracketDetail.raceTitle),
           ),
           drawer: DerbyNavDrawer.getDrawer(context),
 
@@ -42,13 +45,13 @@ class TabbedBracket extends StatelessWidget {
     );
   }
   Widget _getTabContent(List<DisplayableRace> drList){
-    var driverMap = new Map<int, String>();
+
 
     var rpList = new List<Widget>();
     for (var displayableRace in drList) {
       var rrw = null;
         rrw = new RaceResultWidget(
-            displayableRace: displayableRace, driverMap: driverMap);
+            displayableRace: displayableRace, driverMap: globals.globalDerby.racerMap);
 
 
       if (rrw != null) rpList.add(rrw);

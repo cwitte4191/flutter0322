@@ -1,26 +1,33 @@
 import 'package:flutter/material.dart';
-import '../network/GetS3Object.dart';
-import '../models.dart';
-import '../widgets/RaceResultWidget.dart';
-import '../DerbyNavDrawer.dart';
-import '../derbyBodyWidgets.dart';
-import '../testData.dart';
+import 'package:flutter0322/DerbyNavDrawer.dart';
+import 'package:flutter0322/derbyBodyWidgets.dart';
+import 'package:flutter0322/models.dart';
+import 'package:flutter0322/network/GetS3Object.dart';
+
 
 class RaceHistoryPage extends StatelessWidget {
-  final String title;
-  final Map<int,RacePhase> raceMap;
-  RaceHistoryPage({this.title="Race History", this.raceMap});
+  String title;
+  final Map<int,RacePhase> racePhaseMap;
+  final Map<int,RaceStanding> raceStandingMap;
+  RaceHistoryPage({this.title="TEST History", this.racePhaseMap, this.raceStandingMap});
 
   @override
   Widget build(BuildContext context) {
-    print("RaceHistoryPage build: $raceMap");
     Widget bodyWidgets;
-    if(raceMap==null){
-      bodyWidgets=new DerbyBodyWidgets().getTestDataRaceHistoryBody();
+
+    DerbyBodyWidgets derbyBodyWidgets=new DerbyBodyWidgets();
+    if(racePhaseMap!=null) {
+      bodyWidgets = derbyBodyWidgets.getRacePhaseHistoryBody(racePhaseMap);
+      title="Race Phase History";
+    }else if (raceStandingMap!=null) {
+      bodyWidgets=derbyBodyWidgets.getRaceStandingHistoryBody(raceStandingMap);
+      title="Race Heat History";
+
+    }else {
+      bodyWidgets=derbyBodyWidgets.getTestDataRaceHistoryBody();
     }
-    else{
-      bodyWidgets=new DerbyBodyWidgets().getRaceHistoryBody(raceMap);
-    }
+
+
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(title),
@@ -40,7 +47,9 @@ class RaceHistoryPage extends StatelessWidget {
 
     print("RacePhase reload size: "+racerMap.length.toString());
     //TODO: change constructor
+    /*
     Navigator.push(context,
-        new MaterialPageRoute(builder: (context) => new RaceHistoryPage(raceMap: racerMap)));
+        new MaterialPageRoute(builder: (context) => new RaceHistoryPage(racePhaseMap: racerMap)));
+        */
   }
 }

@@ -1,9 +1,19 @@
 library globals;
 
-import 'network/GetS3Object.dart';
+import 'package:flutter0322/models.dart';
+import 'package:flutter0322/network/GetS3Object.dart';
 
+class GlobalDerby {
+  bool isLoggedIn = false;
+  final RaceConfig raceConfig;
+  Map<int, Racer> racerMap=new Map();
+  Map<int, RaceBracket> bracketMap=new Map();
+  RefreshData rdGlobal; //test refresh premature death. gc issue?
 
-bool isLoggedIn = false;
-RaceConfig raceConfig=null;
+  String ndJsonPath;
+  int ndJsonRefreshInProgress;
 
-RefreshData rdGlobal; //test refresh premature death. gc issue?
+  GlobalDerby({this.raceConfig});
+}
+
+GlobalDerby globalDerby=new GlobalDerby();

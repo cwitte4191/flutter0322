@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models.dart';
+import 'package:flutter0322/models.dart';
 
 class RacerWidget extends StatelessWidget {
   final double f1 = 1.8;
@@ -7,7 +7,7 @@ class RacerWidget extends StatelessWidget {
   final Color bgColor;
   RacerWidget({Key, key, this.racer,this.bgColor})
       : assert(racer != null),
-        super(key: key) {}
+        super(key: key) ;
   @override
   Widget build(BuildContext context) {
     return new Container(

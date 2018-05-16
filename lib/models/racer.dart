@@ -18,7 +18,7 @@ class Racer implements HasJsonMap {
   Map toJson(){
     return {"racerName": racerName, "carNumber":carNumber};
   }
-  Racer(){}
+  Racer();
 
   Racer.fromJsonMap(Map jsonMap){
     this.racerName = jsonMap["firstName"];
