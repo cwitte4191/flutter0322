@@ -62,8 +62,9 @@ class GetS3Object {
   }
 
   Future<File> ndJsonFile() async {
-    return _localFile(fileName:"dataLog.ndjson");
+    return _localFile(fileName: "dataLog.ndjson");
   }
+
   Future<File> _localFile({fileName = "foo"}) async {
     final path = await _localPath;
     return new File('$path/$fileName');
@@ -76,47 +77,49 @@ class GetS3Object {
     return file.writeAsString('$counter');
   }
 
-  Future<File> _resumeS3ObjectAsFile(String target,
-      File fName) async {
+  Future<File> _resumeS3ObjectAsFile(String target, File mainFileName) async {
+    List<int> resumeTime = new List();
+    resumeTime.add(DateTime.now().millisecondsSinceEpoch);
 
-    List<int> resumeTime=new List();
-    resumeTime.add( DateTime.now().millisecondsSinceEpoch);
+    print("Resume Download consider ${mainFileName.path}");
 
-    print("Resume Download begin ${fName.path}");
+    int resumeFrom = await getFileLength(mainFileName, "_resume begin");
 
-    FileStat fstat = await FileStat.stat(fName.path);
-    int resumeFrom = 0;
-    if (fstat.type == FileSystemEntityType.NOT_FOUND) {
-      print("Resume Download from FileNotFound");
+    if(resumeFrom==0){
+      print("Resume Download delegating ${mainFileName.path}");
 
-    } else {
-      print("_resume prior Length of file ${fName} is ${fstat.size}");
-      resumeFrom = fstat.size;
+      return getS3ObjectAsFile(target,mainFileName);
     }
+    //var sink1 = fName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
 
-    var sink1 = fName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
     HttpClientResponse response = await new HttpClient()
         .getUrl(Uri.parse(target))
         .then((HttpClientRequest request) {
-          request.headers..add(HttpHeaders.RANGE, "bytes=${resumeFrom}-");
-          return request;
-        })
-        .then((HttpClientRequest request) => request.close());
+      request.headers..add(HttpHeaders.RANGE, "bytes=${resumeFrom}-");
+      return request;
+    }).then((HttpClientRequest request) => request.close());
 
-        await response.pipe(sink1);
-    //await sink1.close();
-    FileStat fstat2 = await FileStat.stat(fName.path);
-    if (fstat.type == FileSystemEntityType.NOT_FOUND) {
-      print("_resume after ERROR NOT FOUND file ${fName}");
+    print ("http response status: ${response.statusCode}");
+    if(response.statusCode==416) {
+      print ("_resumeS3ObjectAsFile: NOOP");
 
-    } else {
-      print("_resume after Length of file ${fName} is ${fstat.size}");
-      resumeFrom = fstat.size;
+      return mainFileName;
     }
-    resumeTime.add( DateTime.now().millisecondsSinceEpoch);
-    this.reportElapsed(resumeTime,"resumeDownload");
 
-    return fName;
+
+    if(response.statusCode==206) {
+      print("_resumeS3ObjectAsFile: resuming with partial download");
+
+
+      var sinkDelta = mainFileName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
+      await response.pipe(sinkDelta);
+    }
+    await getFileLength(mainFileName, "_resume Done");
+
+    resumeTime.add(DateTime.now().millisecondsSinceEpoch);
+    this.reportElapsed(resumeTime, "resumeDownload");
+
+    return mainFileName;
   }
 
   void foo1(String target) async {
@@ -138,8 +141,7 @@ class GetS3Object {
     print("foo2 pipe: done");
   }
 
-  Future<File> getS3ObjectAsFile(String target,
-      File fname) async {
+  Future<File> getS3ObjectAsFile(String target, File fname) async {
     print("Download from ${target} begin ${fname.path}");
 
     FileStat fstat = await FileStat.stat(fname.path);
@@ -185,10 +187,23 @@ class GetS3Object {
     */
   }
 
-  void reportElapsed(List<int>times,String literal) {
-    var start=times[0];
-    for( var x in times){
-      print ("$literal elapsed time: ${x - start}");
+  void reportElapsed(List<int> times, String literal) {
+    var start = times[0];
+    for (var x in times) {
+      print("$literal elapsed time: ${x - start}");
+    }
+  }
+
+  Future<int> getFileLength(File fName, String s) async {
+    FileStat fstat = await FileStat.stat(fName.path);
+    if (fstat.type == FileSystemEntityType.NOT_FOUND) {
+      print("$s getFileLength  FileNotFound: ${fName.path}");
+      return 0;
+    } else {
+      if (s != null) {
+        print("$s getFileLength Length of file ${fName} is ${fstat.size}");
+      }
+      return fstat.size;
     }
   }
 }
@@ -203,20 +218,18 @@ class RefreshData {
     if (raceConfig == null) {
       raceConfig = globals.globalDerby.raceConfig;
     }
-    List<int> ptime=new List();
-    ptime.add( DateTime.now().millisecondsSinceEpoch);
+    List<int> ptime = new List();
+    ptime.add(DateTime.now().millisecondsSinceEpoch);
     String url = "${raceConfig.s3BucketUrlPrefix}/dataLog.ndjson";
 
-    File ndjson=await gs30.ndJsonFile();
-    if(false) {
-      ndjson =
-      await gs30.getS3ObjectAsFile(url, ndjson);
+    File ndjson = await gs30.ndJsonFile();
+    if (false) {
+      ndjson = await gs30.getS3ObjectAsFile(url, ndjson);
+    } else {
+      ndjson = await gs30._resumeS3ObjectAsFile(url, ndjson);
     }
-    else{
-      ndjson=await gs30._resumeS3ObjectAsFile(url,ndjson);
-    }
-    globals.globalDerby.ndJsonPath=ndjson;
-    ptime.add( DateTime.now().millisecondsSinceEpoch);
+    globals.globalDerby.ndJsonPath = ndjson;
+    ptime.add(DateTime.now().millisecondsSinceEpoch);
 
     print("doRefresh begin: " + serializedName);
     print(" ndjson: ${ndjson}");
@@ -224,9 +237,8 @@ class RefreshData {
     Stream<List<int>> inputStream = ndjson.openRead();
     int accumulatedBytes = 0;
 
-
     bool stringFilter(String event) {
-      var q="\"";
+      var q = "\"";
       var pattern = new RegExp("${q}sn${q}:${q}${serializedName}${q}");
       return event.contains(pattern);
     }
@@ -237,8 +249,7 @@ class RefreshData {
         .where(stringFilter)
         .toList();
     ;
-    ptime.add( DateTime.now().millisecondsSinceEpoch);
-
+    ptime.add(DateTime.now().millisecondsSinceEpoch);
 
     print("jj matching strings:" + jj.length.toString());
 
@@ -249,7 +260,7 @@ class RefreshData {
       parseLine(line, serializedName, rcMap);
     }
     print("jj mapSize :" + rcMap.length.toString());
-    ptime.add( DateTime.now().millisecondsSinceEpoch);
+    ptime.add(DateTime.now().millisecondsSinceEpoch);
 
     /*
     await for (var line in lines) {
@@ -260,24 +271,23 @@ class RefreshData {
 
     }
     */
-    if(serializedName=="Racer"){
-      globals.globalDerby.racerMap=rcMap as Map<int, Racer>;
+    if (serializedName == "Racer") {
+      globals.globalDerby.racerMap = rcMap as Map<int, Racer>;
     }
-    if(serializedName=="RaceBracket"){
-      globals.globalDerby.bracketMap=rcMap as Map<int, RaceBracket>;
+    if (serializedName == "RaceBracket") {
+      globals.globalDerby.bracketMap = rcMap as Map<int, RaceBracket>;
     }
     print("doRefresh: done2 await: ${ndjson} map size: " +
         rcMap.length.toString());
 
-    gs30.reportElapsed(ptime,"doRefresh");
+    gs30.reportElapsed(ptime, "doRefresh");
 
     return rcMap;
   }
 
-
   void parseLine<T>(String line, String serializedName, Map<int, T> rcMap) {
     var foo = JSON.decode(line);
-    print("sn:" + foo["sn"]);
+    //print("sn:" + foo["sn"]);
     if (foo["sn"] != serializedName) {
       return;
     }
@@ -313,7 +323,8 @@ class RefreshData {
     if (serializedName == "RaceBracket") {
       RaceBracket r = new RaceBracket.fromJsonMap(foo["data"]);
 
-      if(r.id==null){ // happens on persist, ,not merge!?
+      if (r.id == null) {
+        // happens on persist, ,not merge!?
         return;
       }
       //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
