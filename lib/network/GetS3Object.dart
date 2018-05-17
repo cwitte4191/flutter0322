@@ -313,9 +313,6 @@ class RefreshData {
     if (serializedName == "RaceBracket") {
       RaceBracket r = new RaceBracket.fromJsonMap(foo["data"]);
 
-      print ("Input racebracket:"+line);
-      print ("Parsed racebracket:"+r.id.toString());
-      print ("Parsed raceName:"+r.raceName);
       if(r.id==null){ // happens on persist, ,not merge!?
         return;
       }

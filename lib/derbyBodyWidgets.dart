@@ -26,7 +26,7 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getBracketListBody(Map<int, RaceBracket>bracketMap){
+  Widget getBracketListBody(Map<int, RaceBracket> bracketMap) {
     var bracketWidgetList = new List<Widget>();
     int rowNum = 0;
     void add1Bracket(int key, RaceBracket raceBracket) {
@@ -43,6 +43,7 @@ class DerbyBodyWidgets {
       children: bracketWidgetList,
     );
   }
+
   Widget getRacerListBody(Map<int, Racer> racers) {
     var racerWidgetList = new List<Widget>();
     int rowNum = 0;
@@ -64,51 +65,56 @@ class DerbyBodyWidgets {
   Widget getRacePhaseHistoryBody(Map<int, RacePhase> phaseMap) {
     print("getRacePhaseHistoryBody: begin");
 
-    var rpList = new List<Widget>();
-
+    // var rpWidgetList = new List<Widget>();
+    var racePhaseList = new List<RacePhase>();
 
     void add1Widget(int key, RacePhase racePhase) {
-      RacePhaseUi racePhaseUi = new RacePhaseUi(racePhase);
-      RaceResultWidget rrw = new RaceResultWidget(
-          displayableRace: racePhaseUi, driverMap: globals.globalDerby.racerMap);
-      print("rrw: $rrw");
-      //rpList.add(rrw);
-      rpList.insert(0, rrw); // reverse so most recent is on top
+      racePhaseList.insert(0, racePhase);
     }
 
     phaseMap.forEach(add1Widget);
-    return new ListView(
-      children: rpList,
-    );
+
+    Widget racePhaseItemBuilder(BuildContext context, int index) {
+      print("racePhaseItemBuilder $index");
+      RacePhaseUi racePhaseUi = new RacePhaseUi(racePhaseList[index]);
+      RaceResultWidget rrw = new RaceResultWidget(
+          displayableRace: racePhaseUi,
+          driverMap: globals.globalDerby.racerMap);
+      return rrw;
+    }
+
+    return ListView.builder(
+        itemBuilder: racePhaseItemBuilder, itemCount: racePhaseList.length);
   }
+
   Widget getRaceStandingHistoryBody(Map<int, RaceStanding> standingMap) {
     print("getRacePhaseHistoryBody: begin");
 
-    List<RaceStandingUi> sortedRS = [];
+    List<RaceStanding> raceStandingList = [];
 
     void add1Widget(int key, RaceStanding raceStanding) {
-      RaceStandingUi raceStandingUi = new RaceStandingUi(raceStanding);
-      sortedRS.add(raceStandingUi);
+      //RaceStandingUi raceStandingUi = new RaceStandingUi(raceStanding);
+      raceStandingList.add(raceStanding);
 
-
-      //rpList.add(rrw);
-      //rpList.insert(0, rrw); // reverse so most recent is on top
     }
 
     standingMap.forEach(add1Widget);
-    sortedRS.sort((a, b) => -1*a.raceStanding.lastUpdateMS.compareTo(b.raceStanding.lastUpdateMS));
-    List<Widget> rc = [];
+    raceStandingList.sort((a, b) =>
+        -1 *
+        a.lastUpdateMS.compareTo(b.lastUpdateMS));
 
-    for(var rsUi in sortedRS){
+
+
+    Widget raceStandingItemBuilder(BuildContext context, int index) {
+      print("raceStandingItemBuilder $index");
+      RaceStandingUi raceStandingUi = new RaceStandingUi(raceStandingList[index]);
       RaceResultWidget rrw = new RaceResultWidget(
-          displayableRace: rsUi, driverMap: globals.globalDerby.racerMap);
-      rc.add(rrw);
-     // print("rrw: $rrw");
+          displayableRace: raceStandingUi,
+          driverMap: globals.globalDerby.racerMap);
+      return rrw;
     }
-
-    return new ListView(
-      children: rc,
-    );
+    return ListView.builder(
+        itemBuilder: raceStandingItemBuilder, itemCount: raceStandingList.length);
   }
 
   Widget getTestDataRaceHistoryBody() {
@@ -116,9 +122,10 @@ class DerbyBodyWidgets {
 
     var raceStanding = new RaceStanding(car1: 110, car2: 111);
 
-
-    RacePhase.marshallRaceEntryMapFromRacePair(-50,raceStanding.phase1Entries, raceStanding.racePair);
-    RacePhase.marshallRaceEntryMapFromRacePair(200,raceStanding.phase2Entries, raceStanding.racePair);
+    RacePhase.marshallRaceEntryMapFromRacePair(
+        -50, raceStanding.phase1Entries, raceStanding.racePair);
+    RacePhase.marshallRaceEntryMapFromRacePair(
+        200, raceStanding.phase2Entries, raceStanding.racePair);
 
     raceStanding.chartPosition = "Heat 23";
 
@@ -139,10 +146,10 @@ class DerbyBodyWidgets {
     racePhaseT2.phaseNumber = 2;
 
     var driverMap = new Map<int, Racer>();
-    driverMap[101] = new Racer()..racerName="Bugs";
-    driverMap[201] = new Racer()..racerName="Bunny";
-    driverMap[202] = new Racer()..racerName="Elmer";
-    driverMap[102] = new Racer()..racerName="Fudd";
+    driverMap[101] = new Racer()..racerName = "Bugs";
+    driverMap[201] = new Racer()..racerName = "Bunny";
+    driverMap[202] = new Racer()..racerName = "Elmer";
+    driverMap[102] = new Racer()..racerName = "Fudd";
 
     var rpList = new List<Widget>();
     for (int x = 0; x < 50; x++) {
