@@ -84,20 +84,30 @@ class DerbyBodyWidgets {
   Widget getRaceStandingHistoryBody(Map<int, RaceStanding> standingMap) {
     print("getRacePhaseHistoryBody: begin");
 
-    var rpList = new List<Widget>();
+    List<RaceStandingUi> sortedRS = [];
 
     void add1Widget(int key, RaceStanding raceStanding) {
       RaceStandingUi raceStandingUi = new RaceStandingUi(raceStanding);
-      RaceResultWidget rrw = new RaceResultWidget(
-          displayableRace: raceStandingUi, driverMap: globals.globalDerby.racerMap);
-      print("rrw: $rrw");
+      sortedRS.add(raceStandingUi);
+
+
       //rpList.add(rrw);
-      rpList.insert(0, rrw); // reverse so most recent is on top
+      //rpList.insert(0, rrw); // reverse so most recent is on top
     }
 
     standingMap.forEach(add1Widget);
+    sortedRS.sort((a, b) => -1*a.raceStanding.lastUpdateMS.compareTo(b.raceStanding.lastUpdateMS));
+    List<Widget> rc = [];
+
+    for(var rsUi in sortedRS){
+      RaceResultWidget rrw = new RaceResultWidget(
+          displayableRace: rsUi, driverMap: globals.globalDerby.racerMap);
+      rc.add(rrw);
+     // print("rrw: $rrw");
+    }
+
     return new ListView(
-      children: rpList,
+      children: rc,
     );
   }
 

@@ -61,6 +61,9 @@ class GetS3Object {
     */
   }
 
+  Future<File> ndJsonFile() async {
+    return _localFile(fileName:"dataLog.ndjson");
+  }
   Future<File> _localFile({fileName = "foo"}) async {
     final path = await _localPath;
     return new File('$path/$fileName');
@@ -74,25 +77,24 @@ class GetS3Object {
   }
 
   Future<File> _resumeS3ObjectAsFile(String target,
-      {String localBasename = "MissingF"}) async {
+      File fName) async {
 
     List<int> resumeTime=new List();
     resumeTime.add( DateTime.now().millisecondsSinceEpoch);
 
-    File fname = await _localFile(fileName: localBasename);
-    print("Resume Download begin ${localBasename}");
+    print("Resume Download begin ${fName.path}");
 
-    FileStat fstat = await FileStat.stat(fname.path);
+    FileStat fstat = await FileStat.stat(fName.path);
     int resumeFrom = 0;
     if (fstat.type == FileSystemEntityType.NOT_FOUND) {
       print("Resume Download from FileNotFound");
 
     } else {
-      print("_resume prior Length of file ${fname} is ${fstat.size}");
+      print("_resume prior Length of file ${fName} is ${fstat.size}");
       resumeFrom = fstat.size;
     }
 
-    var sink1 = fname.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
+    var sink1 = fName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
     HttpClientResponse response = await new HttpClient()
         .getUrl(Uri.parse(target))
         .then((HttpClientRequest request) {
@@ -103,18 +105,18 @@ class GetS3Object {
 
         await response.pipe(sink1);
     //await sink1.close();
-    FileStat fstat2 = await FileStat.stat(fname.path);
+    FileStat fstat2 = await FileStat.stat(fName.path);
     if (fstat.type == FileSystemEntityType.NOT_FOUND) {
-      print("_resume after ERROR NOT FOUND file ${fname}");
+      print("_resume after ERROR NOT FOUND file ${fName}");
 
     } else {
-      print("_resume after Length of file ${fname} is ${fstat.size}");
+      print("_resume after Length of file ${fName} is ${fstat.size}");
       resumeFrom = fstat.size;
     }
     resumeTime.add( DateTime.now().millisecondsSinceEpoch);
     this.reportElapsed(resumeTime,"resumeDownload");
 
-    return fname;
+    return fName;
   }
 
   void foo1(String target) async {
@@ -137,9 +139,8 @@ class GetS3Object {
   }
 
   Future<File> getS3ObjectAsFile(String target,
-      {String localBasename = "MissingF"}) async {
-    File fname = await _localFile(fileName: localBasename);
-    print("Download from ${target} begin ${localBasename}");
+      File fname) async {
+    print("Download from ${target} begin ${fname.path}");
 
     FileStat fstat = await FileStat.stat(fname.path);
     print("Length of file before ${fname} is ${fstat.size}");
@@ -155,7 +156,7 @@ class GetS3Object {
     await response.pipe(fname.openWrite());
 
     //await sink1.close();
-    print("Download complete ${localBasename} status: $httpStatus");
+    print("Download complete ${fname.path} status: $httpStatus");
     FileStat fstat2 = await FileStat.stat(fname.path);
     print("Length of file after ${fname} is ${fstat2.size}");
 /*
@@ -206,13 +207,13 @@ class RefreshData {
     ptime.add( DateTime.now().millisecondsSinceEpoch);
     String url = "${raceConfig.s3BucketUrlPrefix}/dataLog.ndjson";
 
-    File ndjson;
+    File ndjson=await gs30.ndJsonFile();
     if(false) {
       ndjson =
-      await gs30.getS3ObjectAsFile(url, localBasename: "dataLog.ndjson");
+      await gs30.getS3ObjectAsFile(url, ndjson);
     }
     else{
-      ndjson=await gs30._resumeS3ObjectAsFile(url,localBasename: "dataLog.ndjson");
+      ndjson=await gs30._resumeS3ObjectAsFile(url,ndjson);
     }
     globals.globalDerby.ndJsonPath=ndjson;
     ptime.add( DateTime.now().millisecondsSinceEpoch);

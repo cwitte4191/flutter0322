@@ -58,12 +58,14 @@ class DerbyNavDrawer {
           new ListTile(
             title: new Text('Racers'),
             onTap: () async {
-              Map<int, Racer> racerMap = null;
+              Map<int, Racer> racerMap = await new RefreshData().doRefresh("Racer");
+              /*
               if (globals.globalDerby.racerMap.length==0) {
                 racerMap = await new RefreshData().doRefresh("Racer");
               } else {
                 racerMap=globals.globalDerby.racerMap;
               }
+              */
               Navigator.push(
                   context,
                   new MaterialPageRoute(
@@ -80,8 +82,10 @@ class DerbyNavDrawer {
           new ListTile(
             title: new Text('Brackets'),
             onTap: () async {
-              Map<int, RaceBracket> bracketMap = null;
               if (globals.globalDerby.raceConfig != null) {
+                Map<int, RaceBracket> bracketMap = await new RefreshData().doRefresh("RaceBracket");
+
+                /*
                 if(globals.globalDerby.bracketMap.length==0) {
                   print("Refreshing bracketMap");
 
@@ -92,6 +96,7 @@ class DerbyNavDrawer {
                   print("Using cached bracketMap");
 
                 }
+                */
                 Navigator.push(
                     context,
                     new MaterialPageRoute(

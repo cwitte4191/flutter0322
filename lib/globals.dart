@@ -15,10 +15,12 @@ class GlobalDerby {
   File ndJsonPath;
   int ndJsonRefreshInProgress;
 
+
   GlobalDerby({this.raceConfig});
-  cleanup(){
-    if(ndJsonPath!=null){
-      ndJsonPath.deleteSync();
+  cleanup()async{
+    File oldNdJson=await new GetS3Object().ndJsonFile();
+    if(oldNdJson!=null){
+      oldNdJson.deleteSync();
     }
   }
 }
