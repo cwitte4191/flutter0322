@@ -79,6 +79,9 @@ class RaceResultWidget extends StatelessWidget {
     displayableRace.getResultsSummary(resultsSummary);
 
     for (var carNumber in displayableRace.getCarNumbers()) {
+      if(carNumber==null){
+        continue;
+      }
       var driverName = driverMap[carNumber]?.racerName;
 
       var iconWidget=resultsSummary.getIcon(carNumber);
