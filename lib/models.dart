@@ -36,10 +36,14 @@ abstract class HasRaceMetaData
 
   RaceMetaData getRaceMetaData();
 }
+enum PhaseStatus { pending, complete, error }
+
 class RaceMetaData{
 
+  final PhaseStatus phaseStatus;
   final String raceUpdateTime;
   final String chartPosition;
   final String raceBracketName;
-  RaceMetaData({this.raceBracketName,this.chartPosition,this.raceUpdateTime});
+
+  RaceMetaData({this.raceBracketName,this.chartPosition,this.raceUpdateTime, this.phaseStatus});
 }

@@ -73,6 +73,17 @@ class RacePhase {
     return raceEntries.keys.toList();
   }
 
+  PhaseStatus getPhaseStatus(){
+    if(this.raceStandingID==null){
+      return PhaseStatus.error;
+    }
+    for(RaceEntry raceEntry in raceEntries.values){
+      if(raceEntry.resultMS!=null){
+        return PhaseStatus.complete;
+      }
+    }
+    return PhaseStatus.pending;
+  }
   @override
   RaceMetaData getRaceMetaData({Map<int,RaceBracket>bracketMap}) {
     DateTime date =
@@ -80,8 +91,9 @@ class RacePhase {
             .toLocal();
     var formattedDate = new DateFormat.Hms().format(date);
     // var dateString = format.format(date);
+
     return new RaceMetaData(
-        raceUpdateTime: formattedDate, chartPosition: "Chart Placeholder");
+        raceUpdateTime: formattedDate, chartPosition: "Chart Placeholder", phaseStatus: getPhaseStatus());
   }
 }
 

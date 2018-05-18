@@ -82,6 +82,7 @@ class GetS3Object {
     resumeTime.add(DateTime.now().millisecondsSinceEpoch);
 
     print("Resume Download consider ${mainFileName.path}");
+    print("Resume Download from ${target}");
 
     int resumeFrom = await getFileLength(mainFileName, "_resume begin");
 

@@ -17,12 +17,18 @@ class RaceResultWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var tcw = new Map<int, TableColumnWidth>();
     tcw[0] = new FractionColumnWidth(0.25);
-
+    Color bgColor;
+    if(displayableRace.getRaceMetaData().phaseStatus==PhaseStatus.error){
+      bgColor=Colors.red;
+    }
+    if(displayableRace.getRaceMetaData().phaseStatus==PhaseStatus.pending){
+      bgColor=Colors.green;
+    }
     Widget tableWidget = new Table(
         columnWidths: tcw,
         //border: new TableBorder.all(),
         children: getChildTableRows(displayableRace, driverMap));
-    return new Card(child: tableWidget);
+    return new Card(child: tableWidget, color: bgColor);
   }
 
   static Widget _getLakeWidget() {
