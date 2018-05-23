@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter0322/models.dart';
+import 'package:flutter0322/models/ModelFactory.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:xml/xml/nodes/document.dart';
@@ -212,9 +213,13 @@ class GetS3Object {
 //class RefreshData<T extends HasJsonMap>{
 //Future<List<T>> doRefresh(RaceConfig raceConfig,String serializedName) async {
 
+typedef bool RefreshFilter(RaceStanding reHydrated) ;
+
 class RefreshData {
+  RefreshFilter refreshFilter;
+  RefreshData({this.refreshFilter});
   Future<Map<int, T>> doRefresh<T>(String serializedName,
-      {RaceConfig raceConfig}) async {
+      {RaceConfig raceConfig }) async {
     GetS3Object gs30 = new GetS3Object();
     if (raceConfig == null) {
       raceConfig = globals.globalDerby.raceConfig;
@@ -259,7 +264,10 @@ class RefreshData {
 
     for (String line in jj) {
       parseLine(line, serializedName, rcMap);
+       ModelFactory.loadDb(line);
     }
+
+
     print("jj mapSize :" + rcMap.length.toString());
     ptime.add(DateTime.now().millisecondsSinceEpoch);
 
@@ -288,6 +296,8 @@ class RefreshData {
 
   void parseLine<T>(String line, String serializedName, Map<int, T> rcMap) {
     var foo = JSON.decode(line);
+    bool isDeleted=foo["type"] == "Remove";
+
     //print("sn:" + foo["sn"]);
     if (foo["sn"] != serializedName) {
       return;
@@ -296,26 +306,33 @@ class RefreshData {
     if (serializedName == "Racer") {
       Racer r = new Racer.fromJsonMap(foo["data"]);
       //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      if (foo["type"] == "Remove") {
+      if (isDeleted) {
         rcMap.remove(r.carNumber);
       } else {
         rcMap[r.carNumber] = (r as T);
       }
+      //globals.globalDerby.derbyDb.execute(r.generateSql(isDeleted));
     }
 
     if (serializedName == "RacePhase") {
       RacePhase r = new RacePhase.fromJsonMap(foo["data"]);
       //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      if (foo["type"] == "Remove") {
+      if (isDeleted) {
         rcMap.remove(r.id);
       } else {
         rcMap[r.id] = (r as T);
       }
+      //globals.globalDerby.derbyDb.execute(r.generateSql(isDeleted));
+
     }
     if (serializedName == "RaceStanding") {
       RaceStanding r = new RaceStanding.fromJsonMap(foo["data"]);
       //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      if (foo["type"] == "Remove") {
+      bool filterRc=false;
+      if(refreshFilter !=null){
+       filterRc=! refreshFilter(r);
+      }
+      if (isDeleted|| filterRc ){
         rcMap.remove(r.id);
       } else {
         rcMap[r.id] = (r as T);
@@ -329,7 +346,7 @@ class RefreshData {
         return;
       }
       //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      if (foo["type"] == "Remove") {
+      if (isDeleted) {
         rcMap.remove(r.id);
       } else {
         rcMap[r.id] = (r as T);

@@ -69,11 +69,12 @@ class RaceSelectionWidget extends StatelessWidget {
 
 
       globals.globalDerby=new globals.GlobalDerby(raceConfig:raceConfig);
-      globals.globalDerby.cleanup();
+      await globals.globalDerby.cleanup();
+       await globals.globalDerby.derbyDb.deleteAndDefine();
 
       Map<int,Racer> racerMap=await new RefreshData().doRefresh( "Racer",raceConfig: raceConfig);
        Navigator.push(context,
-           new MaterialPageRoute(builder: (context) => new RacerHome(racerMap: racerMap)));
+           new MaterialPageRoute(builder: (context) => new RacerHome()));
 
     }
   }

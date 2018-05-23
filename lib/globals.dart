@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
+import 'package:flutter0322/network/derbyDb.dart';
 
 class GlobalDerby {
   bool isLoggedIn = false;
@@ -12,6 +13,7 @@ class GlobalDerby {
   Map<int, RaceBracket> bracketMap=new Map();
   RefreshData rdGlobal; //test refresh premature death. gc issue?
 
+  DerbyDb derbyDb=new DerbyDb();
   File ndJsonPath;
   int ndJsonRefreshInProgress;
 
@@ -19,9 +21,10 @@ class GlobalDerby {
   GlobalDerby({this.raceConfig});
   cleanup()async{
     File oldNdJson=await new GetS3Object().ndJsonFile();
-    if(oldNdJson!=null){
+    if(oldNdJson!=null && oldNdJson.existsSync()){
       oldNdJson.deleteSync();
     }
+    await derbyDb.init();
   }
 }
 

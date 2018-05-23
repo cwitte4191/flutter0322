@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
+//import 'package:color/color.dart';
 
 class RaceResultWidget extends StatelessWidget {
   final double f1 = 1.8;
@@ -19,10 +20,13 @@ class RaceResultWidget extends StatelessWidget {
     tcw[0] = new FractionColumnWidth(0.25);
     Color bgColor;
     if(displayableRace.getRaceMetaData().phaseStatus==PhaseStatus.error){
+       // bgColor=HexColor('FFFF6666');
       bgColor=Colors.red;
     }
     if(displayableRace.getRaceMetaData().phaseStatus==PhaseStatus.pending){
+     // bgColor=HexColor('FF7cfc00');
       bgColor=Colors.green;
+
     }
     Widget tableWidget = new Table(
         columnWidths: tcw,
@@ -77,8 +81,9 @@ class RaceResultWidget extends StatelessWidget {
       updateTime=(updateTime==null)?"":updateTime;
       rbn=(rbn==null)?"":rbn;
       rc.add(new TableRow(children: <Widget>[
+        new Text(updateTime, style: timeStyle,),
         new Text("Heat: $cp $rbn"),
-        new Text(updateTime, style: timeStyle,)
+
       ]));
     }
     var resultsSummary = new ResultsSummary();

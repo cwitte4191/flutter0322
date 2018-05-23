@@ -11,4 +11,8 @@ String jsonDetail;
     this.jsonDetail = jsonMap["json"];
     this.id = jsonMap["id"];
   }
+
+  Tuple2<String, List> generateSql(int isDeleted) {
+    return null;
+  }
 }

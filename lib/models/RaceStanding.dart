@@ -4,8 +4,8 @@ class RaceStanding {
   String chartPosition;
   int raceBracketID;
   int lastUpdateMS;
-  final phase1Entries = new Map<int, RaceEntry>();
-  final phase2Entries = new Map<int, RaceEntry>();
+  final phase1EntryList = new List< RaceEntry>();
+  final phase2EntryList = new List< RaceEntry>();
 
   int phase1DeltaMS; // planning transition to raceEntries
   int phase2DeltaMS; // planning transition
@@ -24,8 +24,8 @@ class RaceStanding {
     phase2DeltaMS = jsonMap["phase2DeltaMS"];
 
     racePair=new RacePair(jsonMap["carNumber1"], jsonMap["carNumber2"]);
-    RacePhase.marshallRaceEntryMap(phase1DeltaMS,phase1Entries, car1: jsonMap["carNumber1"],car2:jsonMap["carNumber2"]);
-    RacePhase.marshallRaceEntryMap(phase2DeltaMS,phase2Entries, car1: jsonMap["carNumber1"],car2:jsonMap["carNumber2"]);
+    RacePhase.marshallRaceEntryList(phase1DeltaMS,phase1EntryList, car1: jsonMap["carNumber1"],car2:jsonMap["carNumber2"]);
+    RacePhase.marshallRaceEntryList(phase2DeltaMS,phase2EntryList, car1: jsonMap["carNumber1"],car2:jsonMap["carNumber2"]);
 
   }
   @override
@@ -46,4 +46,14 @@ class RaceStanding {
     return new RaceMetaData(chartPosition: this.chartPosition, raceUpdateTime: formattedDate,raceBracketName: bracketName);
   }
 
+  static bool isPending(RaceStanding rs){
+    return rs.phase2DeltaMS==null;
+  }
+  static bool isNotPending(RaceStanding rs){
+    return ! isPending(rs);
+  }
+
+  Tuple2<String, List> generateSql(int isDeleted) {
+return null;
+  }
 }

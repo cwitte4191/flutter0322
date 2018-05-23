@@ -38,7 +38,7 @@ class DerbyNavDrawer {
                   context,
                   new MaterialPageRoute(
                       builder: (context) =>
-                          new RaceHistoryPage(racePhaseMap: phaseMap)));
+                          new RaceHistoryPage(historyType: HistoryType.Phase)));
             },
           ),
           new ListTile(
@@ -46,7 +46,7 @@ class DerbyNavDrawer {
             onTap: () async {
               Map<int, RaceStanding> standingMap = null;
               if (globals.globalDerby.raceConfig != null) {
-                standingMap = await new RefreshData().doRefresh("RaceStanding");
+                standingMap = await new RefreshData(refreshFilter: RaceStanding.isNotPending).doRefresh("RaceStanding");
               }
               Navigator.push(
                   context,
@@ -56,28 +56,38 @@ class DerbyNavDrawer {
             },
           ),
           new ListTile(
-            title: new Text('Racers'),
+            title: new Text('Pending Races'),
             onTap: () async {
-              Map<int, Racer> racerMap = await new RefreshData().doRefresh("Racer");
-              /*
-              if (globals.globalDerby.racerMap.length==0) {
-                racerMap = await new RefreshData().doRefresh("Racer");
-              } else {
-                racerMap=globals.globalDerby.racerMap;
+              Map<int, RaceStanding> standingMap = null;
+              Map<int, RaceStanding> pendingMap = {};
+              void filterRS(int key, RaceStanding rs){
+                if(rs.phase2DeltaMS==null){
+                  pendingMap[key]=rs;
+                }
               }
-              */
+              if (globals.globalDerby.raceConfig != null) {
+                standingMap = await new RefreshData(refreshFilter: RaceStanding.isPending).doRefresh("RaceStanding");
+                //standingMap.forEach(filterRS);
+              }
               Navigator.push(
                   context,
                   new MaterialPageRoute(
-                      builder: (context) => new RacerHome(racerMap: racerMap)));
+                      builder: (context) =>
+                      new RaceHistoryPage(racePendingMap: standingMap)));
             },
           ),
           new ListTile(
-            title: new Text('Race Selection'),
-            onTap: () {
-              RaceSelection2.loadAndPush(context);
+            title: new Text('Racers'),
+            onTap: () async {
+              Map<int, Racer> racerMap = await new RefreshData().doRefresh("Racer");
+
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (context) => new RacerHome()));
             },
           ),
+
 
           new ListTile(
             title: new Text('Brackets'),
@@ -106,6 +116,12 @@ class DerbyNavDrawer {
               else{
                 print("Null raceConfig, no brackets allowed");
               }
+            },
+          ),
+          new ListTile(
+            title: new Text('Race Selection'),
+            onTap: () {
+              RaceSelection2.loadAndPush(context);
             },
           ),
         ],

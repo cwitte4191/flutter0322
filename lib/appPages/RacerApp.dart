@@ -7,24 +7,35 @@ import 'dart:math';
 
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
-class RacerHome extends StatelessWidget {
-  final String title;
-  BuildContext lastContext;
-  final Map<int,Racer> racerMap;
-  RacerHome({this.title="Racers", this.racerMap}){
-    const oneSec = const Duration(seconds:5);
-    //new Timer.periodic(oneSec, handleTimeout);
+import 'package:flutter0322/globals.dart' as globals;
+import 'package:flutter0322/widgets/RacerWidget.dart';
+
+class RacerHome extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return new RacerHomeState();
   }
+}
+
+class RacerHomeState extends State<RacerHome> {
+  final String title;
+  List<Map<String,dynamic>> racerDbMap=[];
+
+  BuildContext lastContext;
+   Map<int,Racer> racerMap=globals.globalDerby.racerMap;
+  RacerHomeState({this.title="Racers"});
 
   @override
   Widget build(BuildContext context) {
+    print("RacerHomeState build db length:  ${racerDbMap.length}");
+
     lastContext=context;
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(title),
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
-      body: new DerbyBodyWidgets().getRacerListBody(racerMap),
+      body: getRacerListBodyFromDB(),
       floatingActionButton: new FloatingActionButton(
         onPressed: ()=>
 
@@ -38,17 +49,41 @@ class RacerHome extends StatelessWidget {
   void requestRefresh(BuildContext context) async{
     Map<int,Racer> racerMap=await new RefreshData().doRefresh( "Racer");
     Navigator.push(context,
-        new MaterialPageRoute(builder: (context) => new RacerHome(racerMap: racerMap)));
+        new MaterialPageRoute(builder: (context) => new RacerHome()));
   }
-  void handleTimeout(Timer t) {
-    // callback function
-    print("timeoutfrom main: " + new DateTime.now().millisecondsSinceEpoch.toString());
-    //Pubsub.publish('app.component.action', 1, 2, 3, keywords: 'work also', isnt: 'this fun');
 
-    int carNumber=new Random().nextInt(999);
 
-    racerMap[carNumber]=new Racer()..carNumber=carNumber..racerName="SeventySeven";
-    Navigator.push(lastContext,
-        new MaterialPageRoute(builder: (context) => new RacerHome(racerMap: racerMap)));
+
+
+  Widget racerItemBuilder(BuildContext context, int index) {
+    print("racerItemBuilder $index of ${racerDbMap.length}");
+    Color bg = index % 2 == 0 ? Colors.grey : null;
+
+    Racer racer=new Racer.fromSqlMap(racerDbMap[index]);
+    print("racerItemBuilder $index racer: ${racer.toJson()}");
+
+    Racer testr=new Racer()..carNumber=997..racerName="testr $index";
+    return new RacerWidget(
+      racer: racer,
+      bgColor: bg,
+    );
   }
+
+  Widget getRacerListBodyFromDB() {
+    void repopulate(final List<Map<String, dynamic>> list2 ) {
+      print("repopulateList! $list2");
+
+      setState(() {racerDbMap=list2; });
+    }
+    if(racerDbMap?.length==0) {// TODO: we seem to be recursing w/o this!?
+      globals.globalDerby.derbyDb?.database?.rawQuery(Racer.getSelectSql())
+          ?.then((list) => repopulate(list));
+    }
+
+
+    return ListView.builder(
+        itemBuilder: racerItemBuilder, itemCount: racerDbMap?.length);
+  }
+
 }
+

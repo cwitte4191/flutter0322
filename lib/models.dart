@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tuple/tuple.dart';
 
 part 'models/racer.dart';
 part 'models/RaceBracketDetail.dart';
@@ -28,7 +29,7 @@ abstract class HasCarNumbers {
 
 
 abstract class  HasJsonMap {
-
+  Map toJson();
 }
 
 abstract class HasRaceMetaData

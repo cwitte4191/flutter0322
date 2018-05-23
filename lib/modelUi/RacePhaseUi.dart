@@ -19,12 +19,12 @@ class RacePhaseUi implements DisplayableRace {
     int winningMS = place2.resultMS - winner.resultMS;
     String phase = racePhase.getPhaseLetter();
     if (winningMS == 0) {
-      resultsSummary.addMessage(winner.carNumber, "Phase ${phase}: Tied");
-      resultsSummary.addMessage(place2.carNumber, "Phase ${phase}: Tied");
+      resultsSummary.addMessage(winner.carNumber, "Phase $phase: Tied");
+      resultsSummary.addMessage(place2.carNumber, "Phase $phase: Tied");
     } else {
       String formattedWinningMS=tripleZero.format(winningMS);
       resultsSummary.addMessage(
-          winner.carNumber, "Phase ${phase}: ${formattedWinningMS}MS");
+          winner.carNumber, "Phase $phase: ${formattedWinningMS}MS");
       resultsSummary.setIcon(
           winner.carNumber, RaceResultWidget.getFinishFlagWidget());
     }

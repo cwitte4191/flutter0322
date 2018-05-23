@@ -30,13 +30,14 @@ void main() {
   }
 
 
+
   runApp( new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
         primarySwatch: Colors.green,
       ),
       home: //RaceSelectionWidget.getLoadingDialog()
-     new RacerHome(racerMap: racerMap),
+     new RacerHome(),
     ));
   }
 

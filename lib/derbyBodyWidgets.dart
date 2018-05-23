@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter0322/appPages/RacerApp.dart';
 
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
@@ -44,51 +47,12 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getRacerListBody(Map<int, Racer> racers) {
-    var racerWidgetList = new List<Widget>();
-    int rowNum = 0;
-    void add1Racer(int key, Racer racer) {
-      Color bg = rowNum++ % 2 == 0 ? Colors.grey : null;
-      racerWidgetList.add(new RacerWidget(
-        racer: racer,
-        bgColor: bg,
-      ));
-    }
 
-    racers.forEach(add1Racer);
 
-    return new ListView(
-      children: racerWidgetList,
-    );
-  }
 
-  Widget getRacePhaseHistoryBody(Map<int, RacePhase> phaseMap) {
-    print("getRacePhaseHistoryBody: begin");
-
-    // var rpWidgetList = new List<Widget>();
-    var racePhaseList = new List<RacePhase>();
-
-    void add1Widget(int key, RacePhase racePhase) {
-      racePhaseList.insert(0, racePhase);
-    }
-
-    phaseMap.forEach(add1Widget);
-
-    Widget racePhaseItemBuilder(BuildContext context, int index) {
-      print("racePhaseItemBuilder $index");
-      RacePhaseUi racePhaseUi = new RacePhaseUi(racePhaseList[index]);
-      RaceResultWidget rrw = new RaceResultWidget(
-          displayableRace: racePhaseUi,
-          driverMap: globals.globalDerby.racerMap);
-      return rrw;
-    }
-
-    return ListView.builder(
-        itemBuilder: racePhaseItemBuilder, itemCount: racePhaseList.length);
-  }
 
   Widget getRaceStandingHistoryBody(Map<int, RaceStanding> standingMap) {
-    print("getRacePhaseHistoryBody: begin");
+    print("getRaceStandingHistoryBody: begin");
 
     List<RaceStanding> raceStandingList = [];
 
@@ -122,10 +86,10 @@ class DerbyBodyWidgets {
 
     var raceStanding = new RaceStanding(car1: 110, car2: 111);
 
-    RacePhase.marshallRaceEntryMapFromRacePair(
-        -50, raceStanding.phase1Entries, raceStanding.racePair);
-    RacePhase.marshallRaceEntryMapFromRacePair(
-        200, raceStanding.phase2Entries, raceStanding.racePair);
+    RacePhase.marshallRaceEntryListFromRacePair(
+        -50, raceStanding.phase1EntryList, raceStanding.racePair);
+    RacePhase.marshallRaceEntryListFromRacePair(
+        200, raceStanding.phase2EntryList, raceStanding.racePair);
 
     raceStanding.chartPosition = "Heat 23";
 
