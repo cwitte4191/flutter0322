@@ -47,20 +47,17 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData {
 
     raceEntryList.clear();
 
-    raceEntryList.add(
-        new RaceEntry(carNumber: car1, lane: 1, resultMS: lane1ResultMS));
-    raceEntryList.add(
-
-    new RaceEntry(carNumber: car2, lane: 2, resultMS: lane2ResultMS));
+    raceEntryList
+        .add(new RaceEntry(carNumber: car1, lane: 1, resultMS: lane1ResultMS));
+    raceEntryList
+        .add(new RaceEntry(carNumber: car2, lane: 2, resultMS: lane2ResultMS));
   }
 
   static void marshallRaceEntryListFromRacePair(
-      int resultMS, List< RaceEntry> raceEntryList, RacePair racePair) {
+      int resultMS, List<RaceEntry> raceEntryList, RacePair racePair) {
     marshallRaceEntryList(resultMS, raceEntryList,
         car1: racePair.car1, car2: racePair.car2);
   }
-
-
 
   @override
   Map toJson() {
@@ -132,11 +129,14 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData {
         phaseStatus: getPhaseStatus());
   }
 
-  static String selectSql = "select * from RacePhase where isDeleted=0 order by id desc";
+  static String selectSql =
+      "select * from RacePhase where isDeleted=0 order by id desc";
   static const String insertSql =
       "REPLACE INTO RacePhase(id, raceStandingID, phaseNumber, carNumber1, carNumber2,  resultMS, loadMS, lastUpdateMS, isDeleted) VALUES(?,?,?,?,?,?,?,?,?)";
   static const String createSql =
       "CREATE TABLE RacePhase(id INTEGER PRIMARY KEY, raceStandingID Integer, phaseNumber integer, carNumber1 integer, carNumber2 integer, resultMS integer, loadMS integer, lastUpdateMS integer ,  isDeleted INTEGER) ";
+
+
   Tuple2<String, List<dynamic>> generateSql(int isDeleted) {
     print("racePhase: generateSql: ${this.toJson()} ");
     print("racePhase: raceEntries0: ${this.raceEntryList[0]} ");
@@ -162,8 +162,6 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData {
   static String getSelectSql() {
     return selectSql;
   }
-
-
 }
 
 class RaceEntry {

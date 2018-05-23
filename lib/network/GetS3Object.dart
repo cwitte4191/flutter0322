@@ -87,10 +87,10 @@ class GetS3Object {
 
     int resumeFrom = await getFileLength(mainFileName, "_resume begin");
 
-    if(resumeFrom==0){
+    if (resumeFrom == 0) {
       print("Resume Download delegating ${mainFileName.path}");
 
-      return getS3ObjectAsFile(target,mainFileName);
+      return getS3ObjectAsFile(target, mainFileName);
     }
     //var sink1 = fName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
 
@@ -101,17 +101,15 @@ class GetS3Object {
       return request;
     }).then((HttpClientRequest request) => request.close());
 
-    print ("http response status: ${response.statusCode}");
-    if(response.statusCode==416) {
-      print ("_resumeS3ObjectAsFile: NOOP");
+    print("http response status: ${response.statusCode}");
+    if (response.statusCode == 416) {
+      print("_resumeS3ObjectAsFile: NOOP");
 
       return mainFileName;
     }
 
-
-    if(response.statusCode==206) {
+    if (response.statusCode == 206) {
       print("_resumeS3ObjectAsFile: resuming with partial download");
-
 
       var sinkDelta = mainFileName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
       await response.pipe(sinkDelta);
@@ -213,13 +211,13 @@ class GetS3Object {
 //class RefreshData<T extends HasJsonMap>{
 //Future<List<T>> doRefresh(RaceConfig raceConfig,String serializedName) async {
 
-typedef bool RefreshFilter(RaceStanding reHydrated) ;
+typedef bool RefreshFilter(RaceStanding reHydrated);
 
 class RefreshData {
   RefreshFilter refreshFilter;
   RefreshData({this.refreshFilter});
   Future<Map<int, T>> doRefresh<T>(String serializedName,
-      {RaceConfig raceConfig }) async {
+      {RaceConfig raceConfig}) async {
     GetS3Object gs30 = new GetS3Object();
     if (raceConfig == null) {
       raceConfig = globals.globalDerby.raceConfig;
@@ -252,7 +250,7 @@ class RefreshData {
     List<String> jj = await inputStream
         .transform(new Utf8Decoder())
         .transform(new LineSplitter())
-        .where(stringFilter)
+        //.where(stringFilter)
         .toList();
     ;
     ptime.add(DateTime.now().millisecondsSinceEpoch);
@@ -263,10 +261,11 @@ class RefreshData {
     SplayTreeMap<int, T> rcMap = new SplayTreeMap();
 
     for (String line in jj) {
-      parseLine(line, serializedName, rcMap);
-       ModelFactory.loadDb(line);
+      if (stringFilter(line)) {
+        parseLine(line, serializedName, rcMap);
+      }
+      ModelFactory.loadDb(line);
     }
-
 
     print("jj mapSize :" + rcMap.length.toString());
     ptime.add(DateTime.now().millisecondsSinceEpoch);
@@ -296,7 +295,7 @@ class RefreshData {
 
   void parseLine<T>(String line, String serializedName, Map<int, T> rcMap) {
     var foo = JSON.decode(line);
-    bool isDeleted=foo["type"] == "Remove";
+    bool isDeleted = foo["type"] == "Remove";
 
     //print("sn:" + foo["sn"]);
     if (foo["sn"] != serializedName) {
@@ -328,11 +327,11 @@ class RefreshData {
     if (serializedName == "RaceStanding") {
       RaceStanding r = new RaceStanding.fromJsonMap(foo["data"]);
       //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      bool filterRc=false;
-      if(refreshFilter !=null){
-       filterRc=! refreshFilter(r);
+      bool filterRc = false;
+      if (refreshFilter != null) {
+        filterRc = !refreshFilter(r);
       }
-      if (isDeleted|| filterRc ){
+      if (isDeleted || filterRc) {
         rcMap.remove(r.id);
       } else {
         rcMap[r.id] = (r as T);

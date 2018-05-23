@@ -7,19 +7,20 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:tuple/tuple.dart';
 
-class DerbyDb{
+class DerbyDb {
   String dbPath;
   Database database;
   Future init() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-     dbPath = join(documentsDirectory.path, "demo.db");
-    File dbFile=new File(dbPath);
-    if(!dbFile.existsSync()){
+    dbPath = join(documentsDirectory.path, "demo.db");
+    File dbFile = new File(dbPath);
+    if (!dbFile.existsSync()) {
       await deleteAndDefine();
     }
     await demo();
   }
-  Future demo()async{
+
+  Future demo() async {
     // Get a location using path_provider
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "demo.db");
@@ -30,10 +31,10 @@ class DerbyDb{
 // open the database
     Database database = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
-          // When creating the db, create the table
-          await db.execute(
-              "CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
-        });
+      // When creating the db, create the table
+      await db.execute(
+          "CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
+    });
 
 // Insert some records in a transaction
     await database.transaction((txn) async {
@@ -76,32 +77,30 @@ class DerbyDb{
     await database.close();
   }
 
-  Future deleteAndDefine()async {
+  Future deleteAndDefine() async {
     print("deleteAndDefine: beginning.");
     await deleteDatabase(dbPath);
 
     print("deleteAndDefine: opening.");
 
     // open the database
-     database = await openDatabase(dbPath, version: 2,
-        onOpen: (Database db) async {
-          print("deleteAndDefine: onOpen Beginning.");
+    database =
+        await openDatabase(dbPath, version: 2, onOpen: (Database db) async {
+      print("deleteAndDefine: onOpen Beginning.");
+    }, onCreate: (Database db, int version) async {
+      print("deleteAndDefine: onCreate Beginning.");
 
-        },
-        onCreate: (Database db, int version) async {
-          print("deleteAndDefine: onCreate Beginning.");
-
-          // When creating the db, create the table
-          await db.execute(
+      // When creating the db, create the table
+      await db.execute(
           //    "CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
-             "CREATE TABLE Derby (id INTEGER PRIMARY KEY, datatype TEXT, json TEXT)");
-          await db.execute(Racer.getCreateSql());
-          await db.execute(RacePhase.getCreateSql());
-          print("deleteAndDefine: create complete.");
+          "CREATE TABLE Derby (id INTEGER PRIMARY KEY, datatype TEXT, json TEXT)");
+      await db.execute(Racer.getCreateSql());
+      await db.execute(RacePhase.getCreateSql());
+      await db.execute(RaceStanding.getCreateSql());
+      print("deleteAndDefine: create complete.");
+    });
 
-        });
-
-;
+    ;
     print("deleteAndDefine: inserting");
 
     // Insert some records in a transaction
@@ -114,18 +113,13 @@ class DerbyDb{
           [-2, "another name", "['foo']"]);
       print("inserted2e: $id2");
     });
-     List<Map> list = await database.rawQuery('SELECT * FROM Derby;');
-      print("select done: $list");
-
-
-
-
+    List<Map> list = await database.rawQuery('SELECT * FROM Derby;');
+    print("select done: $list");
   }
 
-  Future execute(Tuple2<String,List<dynamic>>args) async {
-     return database.execute(
-        args.item1,
-        args.item2);
+  Future execute(Tuple2<String, List<dynamic>> args) async {
+    if (args!=null && args.item1 != null) {
+      return database.execute(args.item1, args.item2);
+    }
   }
-
 }

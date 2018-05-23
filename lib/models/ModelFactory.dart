@@ -13,19 +13,19 @@ class ModelFactory {
 
     if (serializedName == "Racer") {
       Racer r = new Racer.fromJsonMap(foo["data"]);
-      globals.globalDerby.derbyDb.execute(r.generateSql(_isDeletedAsInt(isDeleted)));
+      globals.globalDerby.derbyDb.execute(r.generateSql(boolAsInt(isDeleted)));
       return;
     }
 
     if (serializedName == "RacePhase") {
       RacePhase r = new RacePhase.fromJsonMap(foo["data"]);
 
-      globals.globalDerby.derbyDb.execute(r.generateSql(_isDeletedAsInt(isDeleted)));
+      globals.globalDerby.derbyDb.execute(r.generateSql(boolAsInt(isDeleted)));
       return;
     }
     if (serializedName == "RaceStanding") {
       RaceStanding r = new RaceStanding.fromJsonMap(foo["data"]);
-      globals.globalDerby.derbyDb.execute(r.generateSql(_isDeletedAsInt(isDeleted)));
+      globals.globalDerby.derbyDb.execute(r.generateSql(boolAsInt(isDeleted)));
     }
     if (serializedName == "RaceBracket") {
       RaceBracket r = new RaceBracket.fromJsonMap(foo["data"]);
@@ -34,10 +34,10 @@ class ModelFactory {
         // happens on persist, ,not merge!?
         return;
       }
-      globals.globalDerby.derbyDb.execute(r.generateSql(_isDeletedAsInt(isDeleted)));
+      globals.globalDerby.derbyDb.execute(r.generateSql(boolAsInt(isDeleted)));
     }
   }
-  static int _isDeletedAsInt(bool isDeleted) {
+  static int boolAsInt(bool isDeleted) {
     return(isDeleted?1:0);
   }
 }

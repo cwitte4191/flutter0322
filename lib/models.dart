@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
+import 'package:flutter0322/models/ModelFactory.dart';
 
 part 'models/racer.dart';
 part 'models/RaceBracketDetail.dart';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter0322/DerbyNavDrawer.dart';
+import 'package:flutter0322/appPages/RacePhasePage.dart';
+import 'package:flutter0322/appPages/RaceStandingPage.dart';
 import 'package:flutter0322/derbyBodyWidgets.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
@@ -9,46 +11,25 @@ import 'package:flutter0322/widgets/RaceResultWidget.dart';
 
 enum HistoryType{ Phase, Standing, Pending}
 class RaceHistoryPage extends StatefulWidget{
-  final HistoryType historyType;
-  final Map<int,RaceStanding> raceStandingMap;
-  final Map<int,RaceStanding> racePendingMap;
 
-  RaceHistoryPage({this.historyType, this.raceStandingMap, this.racePendingMap});
+
   @override
   State<StatefulWidget> createState() {
-    return new RaceHistoryPageState(historyType: this.historyType,raceStandingMap: this.raceStandingMap, racePendingMap: this.racePendingMap);
+    return new RaceHistoryPageState();
   }
 }
 class RaceHistoryPageState extends State<RaceHistoryPage> {
-  String title;
-   List<Map<String,dynamic>> racePhaseList=[];
-  final Map<int,RaceStanding> raceStandingMap;
-  final Map<int,RaceStanding> racePendingMap;
-  final HistoryType historyType;
-  RaceHistoryPageState({this.historyType,  this.raceStandingMap, this.racePendingMap});
+  String title="Update me";
+
+  RaceHistoryPageState();
 
   @override
   Widget build(BuildContext context) {
-    Widget bodyWidgets;
 
-    DerbyBodyWidgets derbyBodyWidgets=new DerbyBodyWidgets();
-    if(historyType==HistoryType.Phase) {
-      bodyWidgets = this.getRacePhaseHistoryBodyFromDB();
-      title="Race Phase History";
-    }else if (raceStandingMap!=null) {
-      bodyWidgets=derbyBodyWidgets.getRaceStandingHistoryBody(raceStandingMap);
-      title="Race Heat History";
-    }else if (racePendingMap!=null) {
-      bodyWidgets=derbyBodyWidgets.getRaceStandingHistoryBody(racePendingMap);
-      title="Pending Races";
-    }else {
-      bodyWidgets=derbyBodyWidgets.getTestDataRaceHistoryBody();
-    }
 
     final List<Tab> myTabs = <Tab>[
       new Tab(text: 'Phases'),
       new Tab(text: 'Heats'),
-
       new Tab(text: 'Pending'),
     ];
 
@@ -65,7 +46,7 @@ class RaceHistoryPageState extends State<RaceHistoryPage> {
           ),
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
-      body: new TabBarView(children: <Widget>[bodyWidgets,bodyWidgets,bodyWidgets]),
+      body: new TabBarView(children: <Widget>[new RacePhasePage(),new RaceStandingPage(historyType:HistoryType.Standing),new  RaceStandingPage(historyType:HistoryType.Pending)]),
       floatingActionButton: new FloatingActionButton(
         onPressed: ()=>          requestRefresh(context)
         ,
@@ -73,9 +54,12 @@ class RaceHistoryPageState extends State<RaceHistoryPage> {
         child: new Icon(Icons.add),
       ), // This tr
     );
-    return new DefaultTabController(
+    var tabController=
+     new DefaultTabController(
         length: myTabs.length,
         child: scaffold);
+    //tabController.addListener();
+    return tabController;
   }
   void requestRefresh(BuildContext context) async{
     Map<int,RacePhase> racerMap=await new RefreshData().doRefresh( "RacePhase");
@@ -90,30 +74,6 @@ class RaceHistoryPageState extends State<RaceHistoryPage> {
 
 
 
-  Widget getRacePhaseHistoryBodyFromDB() {
-    void repopulate(final List<Map<String, dynamic>> list2 ) {
-      print("RacePhase: repopulateList! $list2");
-
-      setState(() {racePhaseList=list2; });
-    }
-    if(racePhaseList?.length==0) {// TODO: we seem to be recursing w/o this!?
-      globals.globalDerby.derbyDb?.database?.rawQuery(RacePhase.getSelectSql())
-          ?.then((list) => repopulate(list));
-    }
-
-
-    return ListView.builder(
-        itemBuilder: racePhaseItemBuilder, itemCount: racePhaseList?.length);
-  }
-  Widget racePhaseItemBuilder(BuildContext context, int index) {
-    RacePhase racePhase=new RacePhase.fromSqlMap(racePhaseList[index]);
-
-    RacePhaseUi racePhaseUi = new RacePhaseUi(racePhase);
-    RaceResultWidget rrw = new RaceResultWidget(
-        displayableRace: racePhaseUi,
-        driverMap: globals.globalDerby.racerMap);
-    return rrw;
-  }
 
 
 }

@@ -38,44 +38,11 @@ class DerbyNavDrawer {
                   context,
                   new MaterialPageRoute(
                       builder: (context) =>
-                          new RaceHistoryPage(historyType: HistoryType.Phase)));
+                          new RaceHistoryPage()));
             },
           ),
-          new ListTile(
-            title: new Text('Race Heats'),
-            onTap: () async {
-              Map<int, RaceStanding> standingMap = null;
-              if (globals.globalDerby.raceConfig != null) {
-                standingMap = await new RefreshData(refreshFilter: RaceStanding.isNotPending).doRefresh("RaceStanding");
-              }
-              Navigator.push(
-                  context,
-                  new MaterialPageRoute(
-                      builder: (context) =>
-                          new RaceHistoryPage(raceStandingMap: standingMap)));
-            },
-          ),
-          new ListTile(
-            title: new Text('Pending Races'),
-            onTap: () async {
-              Map<int, RaceStanding> standingMap = null;
-              Map<int, RaceStanding> pendingMap = {};
-              void filterRS(int key, RaceStanding rs){
-                if(rs.phase2DeltaMS==null){
-                  pendingMap[key]=rs;
-                }
-              }
-              if (globals.globalDerby.raceConfig != null) {
-                standingMap = await new RefreshData(refreshFilter: RaceStanding.isPending).doRefresh("RaceStanding");
-                //standingMap.forEach(filterRS);
-              }
-              Navigator.push(
-                  context,
-                  new MaterialPageRoute(
-                      builder: (context) =>
-                      new RaceHistoryPage(racePendingMap: standingMap)));
-            },
-          ),
+
+
           new ListTile(
             title: new Text('Racers'),
             onTap: () async {
