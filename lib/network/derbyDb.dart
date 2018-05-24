@@ -33,14 +33,33 @@ class DerbyDb {
     fromNetworkController.add(
         new Racer(carNumber: 901, racerName: "Hardcoded"));
 
-    fromNetworkController.stream.forEach((model) => addNewModel(model));
+    fromNetworkController.stream.forEach((model) =>  addNewModel(model));
   }
 
   void createRecentChangesStream() {
     recentChangesController = StreamController.broadcast<String>();
+
   }
 
+  void testBroadcastSink(){
+    final String tbs="testBroadcastSink";
+    print("testBroadcastSink $tbs begin.");
+    recentChangesController.stream.listen((istring)=>print("$tbs recentChangesSubscriber1: got $istring"));
+    recentChangesController.stream.listen((istring)=>print("$tbs recentChangesSubscriber2: got $istring"));
 
+    int now=new DateTime.now().millisecondsSinceEpoch;
+    Sink<String>ss=recentChangesController.sink;
+    recentChangesController.add("$tbs testBroadcast now:  $now" );
+
+    countStream(5).pipe(recentChangesController);
+   // countStream(8).pipe(recentChangesController);
+  }
+
+  Stream<String> countStream(int to) async* {
+    for (int i = 1; i <= to; i++) {
+      yield i.toString();
+    }
+  }
   Future deleteAndDefine() async {
     print("deleteAndDefine: beginning.");
     await deleteDatabase(dbPath);
@@ -90,8 +109,9 @@ class DerbyDb {
     }
   }
   final RecentWatch recentWatch=new RecentWatch();
-  addNewModel(HasRelational model) {
-    execute(model.generateSql());
+
+  Future addNewModel(HasRelational model) async {
+    await execute(model.generateSql());
     recentWatch.receivedInput(this,model.runtimeType.toString());
 
   }

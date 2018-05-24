@@ -388,16 +388,17 @@ class RefreshData {
 }
 
 class RaceConfig {
+  final String raceName;
   final String applicationUrl;
   final String s3BucketUrlPrefix;
-  RaceConfig({this.applicationUrl, this.s3BucketUrlPrefix}) {}
-  static RaceConfig fromXml(String xmlString) {
+  RaceConfig({this.applicationUrl, this.s3BucketUrlPrefix, this.raceName}) {}
+  static RaceConfig fromXml(String xmlString,{String raceName}) {
     var document = xml.parse(xmlString);
     print("RaceConfig fromXml: " + document.toString());
     String applicationUrl = getTextForTag(document, "applicationUrl");
     String s3BucketUrlPrefix = getTextForTag(document, "s3BucketUrlPrefix");
     return new RaceConfig(
-        applicationUrl: applicationUrl, s3BucketUrlPrefix: s3BucketUrlPrefix);
+        applicationUrl: applicationUrl, s3BucketUrlPrefix: s3BucketUrlPrefix, raceName:raceName);
   }
 
   static String getTextForTag(XmlDocument doc, String tag) {

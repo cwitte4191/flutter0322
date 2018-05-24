@@ -10,7 +10,8 @@ class DerbyNavDrawer {
     String title = "Derby Menu";
     bool hasConfig = globals.globalDerby.raceConfig != null;
     if (hasConfig) {
-      title = globals.globalDerby.raceConfig.s3BucketUrlPrefix;
+      title = globals.globalDerby.raceConfig.raceName;
+      title=(title==null)?"Derby Race":title;
     }
 
     List<Widget> drawerItems = [];
@@ -44,6 +45,7 @@ class DerbyNavDrawer {
       drawerItems.add(new ListTile(
         title: new Text('Brackets'),
         onTap: () async {
+
             Navigator.push(context,
                 new MaterialPageRoute(builder: (context) => new BracketList()));
 
@@ -55,6 +57,7 @@ class DerbyNavDrawer {
     drawerItems.add(new ListTile(
       title: new Text('Race Selection'),
       onTap: () {
+
         RaceSelection2.loadAndPush(context);
       },
     ));

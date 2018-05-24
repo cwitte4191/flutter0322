@@ -5,28 +5,28 @@ import 'package:flutter0322/globals.dart' as globals;
 
 class ModelFactory {
   static HasRelational loadDb(String jsonString) {
-    var foo = JSON.decode(jsonString);
-    if (foo["type"] == "Remove") {
-      foo["isDeleted"] = 1; // integer for interop with sqlite
+    var jsonMap = JSON.decode(jsonString);
+    if (jsonMap["type"] == "Remove") {
+      jsonMap["data"]["isDeleted"]=1; // integer for interop with sqlite
     }
 
     //print("ModelFactory: loadDb $jsonString");
 
-    String serializedName = foo["sn"];
+    String serializedName = jsonMap["sn"];
 
     HasRelational rc;
     switch (serializedName) {
       case "Racer":
-        rc = new Racer.fromJsonMap(foo["data"]);
+        rc = new Racer.fromJsonMap(jsonMap["data"]);
         break;
       case "RacePhase":
-        rc = new RacePhase.fromJsonMap(foo["data"]);
+        rc = new RacePhase.fromJsonMap(jsonMap["data"]);
         break;
       case "RaceStanding":
-        rc = new RaceStanding.fromJsonMap(foo["data"]);
+        rc = new RaceStanding.fromJsonMap(jsonMap["data"]);
         break;
       case "RaceBracket":
-        rc = new RaceBracket.fromJsonMap(foo["data"]);
+        rc = new RaceBracket.fromJsonMap(jsonMap["data"]);
     }
 
     //print("ModelFactory: publishing:  $rc");

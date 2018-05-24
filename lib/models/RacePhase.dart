@@ -1,6 +1,7 @@
 part of models;
 
-class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData, HasRelational {
+class RacePhase
+    implements HasJsonMap, HasCarNumbers, HasRaceMetaData, HasRelational {
   int id;
   final raceEntryList = new List<RaceEntry>();
   int loadMs;
@@ -31,8 +32,10 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData, HasRelati
     marshallRaceEntryList(resultMS, raceEntryList,
         car1: jsonMap["carNumber1"], car2: jsonMap["carNumber2"]);
 
-    this.isDeleted=parseIsDeleted(jsonMap["isDeleted"]);
-
+    this.isDeleted = parseIsDeleted(jsonMap["isDeleted"]);
+    if(getCarNumbers().contains(113)){
+      print ("initFromMap 113: $jsonMap");
+    }
   }
 
   static void marshallRaceEntryList(int resultMS, List<RaceEntry> raceEntryList,
@@ -136,10 +139,13 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData, HasRelati
   static String selectSql =
       "select * from RacePhase where isDeleted=0 order by id desc";
   static const String insertSql =
-      "REPLACE INTO RacePhase(id, raceStandingID, phaseNumber, carNumber1, carNumber2,  resultMS, loadMS, lastUpdateMS, isDeleted) VALUES(?,?,?,?,?,?,?,?,?)";
+      "REPLACE INTO RacePhase(id, raceStandingID, phaseNumber,  "
+      "  carNumber1, carNumber2,  resultMS,    "
+      " loadMS, lastUpdateMS, isDeleted) VALUES(?,?,?,   ?,?,?,   ?,?,?)";
   static const String createSql =
-      "CREATE TABLE RacePhase(id INTEGER PRIMARY KEY, raceStandingID Integer, phaseNumber integer, carNumber1 integer, carNumber2 integer, resultMS integer, loadMS integer, lastUpdateMS integer ,  isDeleted INTEGER) ";
-
+      "CREATE TABLE RacePhase(id INTEGER PRIMARY KEY, raceStandingID Integer, phaseNumber integer,    "
+      "carNumber1 integer, carNumber2 integer, resultMS integer, "
+      "loadMS integer, lastUpdateMS integer ,  isDeleted INTEGER) ";
 
   Tuple2<String, List<dynamic>> generateSql() {
     return new Tuple2(insertSql, [
@@ -147,13 +153,14 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData, HasRelati
       this.id, //
       this.raceStandingID, //
       this.phaseNumber, //
+
       this.raceEntryList[0].carNumber, //
       this.raceEntryList[1].carNumber, //
       getCompatResultMs(), //
+
       this.loadMs,
       this.lastUpdateMs,
       ModelFactory.boolAsInt(isDeleted)
-
     ]);
   }
 
