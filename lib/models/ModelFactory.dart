@@ -4,40 +4,39 @@ import 'package:flutter0322/models.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
 class ModelFactory {
-  static void loadDb(String jsonString) {
+  static HasRelational loadDb(String jsonString) {
     var foo = JSON.decode(jsonString);
-    print ("ModelFactory: loadDb $jsonString");
-    bool isDeleted = foo["type"] == "Remove";
+    if (foo["type"] == "Remove") {
+      foo["isDeleted"] = 1; // integer for interop with sqlite
+    }
+
+    //print("ModelFactory: loadDb $jsonString");
 
     String serializedName = foo["sn"];
 
-    if (serializedName == "Racer") {
-      Racer r = new Racer.fromJsonMap(foo["data"]);
-      globals.globalDerby.derbyDb.execute(r.generateSql(boolAsInt(isDeleted)));
-      return;
+    HasRelational rc;
+    switch (serializedName) {
+      case "Racer":
+        rc = new Racer.fromJsonMap(foo["data"]);
+        break;
+      case "RacePhase":
+        rc = new RacePhase.fromJsonMap(foo["data"]);
+        break;
+      case "RaceStanding":
+        rc = new RaceStanding.fromJsonMap(foo["data"]);
+        break;
+      case "RaceBracket":
+        rc = new RaceBracket.fromJsonMap(foo["data"]);
     }
 
-    if (serializedName == "RacePhase") {
-      RacePhase r = new RacePhase.fromJsonMap(foo["data"]);
+    //print("ModelFactory: publishing:  $rc");
 
-      globals.globalDerby.derbyDb.execute(r.generateSql(boolAsInt(isDeleted)));
-      return;
-    }
-    if (serializedName == "RaceStanding") {
-      RaceStanding r = new RaceStanding.fromJsonMap(foo["data"]);
-      globals.globalDerby.derbyDb.execute(r.generateSql(boolAsInt(isDeleted)));
-    }
-    if (serializedName == "RaceBracket") {
-      RaceBracket r = new RaceBracket.fromJsonMap(foo["data"]);
+    if (rc != null) globals.globalDerby.derbyDb.fromNetworkController.add(rc);
 
-      if (r.id == null) {
-        // happens on persist, ,not merge!?
-        return;
-      }
-      globals.globalDerby.derbyDb.execute(r.generateSql(boolAsInt(isDeleted)));
-    }
+    return rc;
   }
+
   static int boolAsInt(bool isDeleted) {
-    return(isDeleted?1:0);
+    return (isDeleted ? 1 : 0);
   }
 }

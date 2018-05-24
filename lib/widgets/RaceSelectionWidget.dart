@@ -25,7 +25,6 @@ class RaceSelectionWidget extends StatelessWidget {
     print("trucateDf: ${truncateDf}");
     return new GestureDetector(
         onTap: () {
-
           handleTap(context);
         },
         child: new Container(
@@ -69,10 +68,10 @@ class RaceSelectionWidget extends StatelessWidget {
 
 
       globals.globalDerby=new globals.GlobalDerby(raceConfig:raceConfig);
-      await globals.globalDerby.cleanup();
-       await globals.globalDerby.derbyDb.deleteAndDefine();
 
-      Map<int,Racer> racerMap=await new RefreshData().doRefresh( "Racer",raceConfig: raceConfig);
+      await globals.globalDerby.init(true);
+
+      Map<int,Racer> racerMap=await new RefreshData().doRefresh( raceConfig: raceConfig);
        Navigator.push(context,
            new MaterialPageRoute(builder: (context) => new RacerHome()));
 

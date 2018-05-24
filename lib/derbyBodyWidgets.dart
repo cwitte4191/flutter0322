@@ -1,15 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter0322/appPages/RacerApp.dart';
-
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/testData.dart';
 import 'package:flutter0322/widgets/RaceBracketWidget.dart';
 import 'package:flutter0322/widgets/RaceResultWidget.dart';
 import 'package:flutter0322/widgets/RaceSelectionWidget.dart';
-import 'package:flutter0322/widgets/RacerWidget.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
 class DerbyBodyWidgets {
@@ -29,7 +24,7 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getBracketListBody(Map<int, RaceBracket> bracketMap) {
+  Widget getBracketListBody() {
     var bracketWidgetList = new List<Widget>();
     int rowNum = 0;
     void add1Bracket(int key, RaceBracket raceBracket) {
@@ -40,6 +35,8 @@ class DerbyBodyWidgets {
       ));
     }
 
+    Map<int, RaceBracket> bracketMap=globals.globalDerby.getRaceBrakcetCache();
+    print("getBracketListBody2: ${bracketMap.length}");
     bracketMap.forEach(add1Bracket);
 
     return new ListView(
@@ -74,7 +71,7 @@ class DerbyBodyWidgets {
       RaceStandingUi raceStandingUi = new RaceStandingUi(raceStandingList[index]);
       RaceResultWidget rrw = new RaceResultWidget(
           displayableRace: raceStandingUi,
-          driverMap: globals.globalDerby.racerMap);
+          );
       return rrw;
     }
     return ListView.builder(
@@ -120,18 +117,15 @@ class DerbyBodyWidgets {
       var rrw = null;
       if (x % 3 == 0) {
         rrw = new RaceResultWidget(
-            displayableRace: new RacePhaseUi(racePhaseT1),
-            driverMap: driverMap);
+            displayableRace: new RacePhaseUi(racePhaseT1));
       }
       if (x % 3 == 1) {
         rrw = new RaceResultWidget(
-            displayableRace: new RacePhaseUi(racePhaseT2),
-            driverMap: driverMap);
+            displayableRace: new RacePhaseUi(racePhaseT2));
       }
       if (x % 3 == 2) {
         rrw = new RaceResultWidget(
-            displayableRace: new RaceStandingUi(raceStanding),
-            driverMap: driverMap);
+            displayableRace: new RaceStandingUi(raceStanding));
       }
 
       if (rrw != null) rpList.add(rrw);

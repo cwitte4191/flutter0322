@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter0322/DerbyNavDrawer.dart';
 import 'package:flutter0322/modelUi.dart';
-import 'package:flutter0322/models.dart';
 import 'package:flutter0322/widgets/RaceResultWidget.dart';
-import 'package:flutter0322/globals.dart' as globals;
 
 
 class TabbedBracket extends StatelessWidget {
@@ -51,7 +49,7 @@ class TabbedBracket extends StatelessWidget {
     for (var displayableRace in drList) {
       var rrw = null;
         rrw = new RaceResultWidget(
-            displayableRace: displayableRace, driverMap: globals.globalDerby.racerMap);
+            displayableRace: displayableRace);
 
 
       if (rrw != null) rpList.add(rrw);

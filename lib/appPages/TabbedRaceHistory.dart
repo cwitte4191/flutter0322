@@ -2,26 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter0322/DerbyNavDrawer.dart';
 import 'package:flutter0322/appPages/RacePhasePage.dart';
 import 'package:flutter0322/appPages/RaceStandingPage.dart';
-import 'package:flutter0322/derbyBodyWidgets.dart';
-import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
-import 'package:flutter0322/globals.dart' as globals;
-import 'package:flutter0322/widgets/RaceResultWidget.dart';
 
 enum HistoryType{ Phase, Standing, Pending}
-class RaceHistoryPage extends StatefulWidget{
+class TabbedRaceHistory extends StatefulWidget{
 
 
   @override
   State<StatefulWidget> createState() {
-    return new RaceHistoryPageState();
+    return new _TabbedRaceHistoryState();
   }
 }
-class RaceHistoryPageState extends State<RaceHistoryPage> {
+class _TabbedRaceHistoryState extends State<TabbedRaceHistory> {
   String title="Update me";
 
-  RaceHistoryPageState();
+  _TabbedRaceHistoryState();
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +58,7 @@ class RaceHistoryPageState extends State<RaceHistoryPage> {
     return tabController;
   }
   void requestRefresh(BuildContext context) async{
-    Map<int,RacePhase> racerMap=await new RefreshData().doRefresh( "RacePhase");
+    Map<int,RacePhase> racerMap=await new RefreshData().doRefresh();
 
     print("RacePhase reload size: "+racerMap.length.toString());
     //TODO: change constructor

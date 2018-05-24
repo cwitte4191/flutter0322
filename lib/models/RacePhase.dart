@@ -1,6 +1,6 @@
 part of models;
 
-class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData {
+class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData, HasRelational {
   int id;
   final raceEntryList = new List<RaceEntry>();
   int loadMs;
@@ -8,6 +8,7 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData {
   int startMs;
   int phaseNumber;
   int raceStandingID;
+  bool isDeleted;
 
   String getPhaseLetter() {
     return phaseNumber == 1 ? "A" : "B";
@@ -29,6 +30,9 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData {
     int resultMS = jsonMap["resultMS"];
     marshallRaceEntryList(resultMS, raceEntryList,
         car1: jsonMap["carNumber1"], car2: jsonMap["carNumber2"]);
+
+    this.isDeleted=parseIsDeleted(jsonMap["isDeleted"]);
+
   }
 
   static void marshallRaceEntryList(int resultMS, List<RaceEntry> raceEntryList,
@@ -137,10 +141,7 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData {
       "CREATE TABLE RacePhase(id INTEGER PRIMARY KEY, raceStandingID Integer, phaseNumber integer, carNumber1 integer, carNumber2 integer, resultMS integer, loadMS integer, lastUpdateMS integer ,  isDeleted INTEGER) ";
 
 
-  Tuple2<String, List<dynamic>> generateSql(int isDeleted) {
-    print("racePhase: generateSql: ${this.toJson()} ");
-    print("racePhase: raceEntries0: ${this.raceEntryList[0]} ");
-    print("racePhase: raceEntries1: ${this.raceEntryList[1]} ");
+  Tuple2<String, List<dynamic>> generateSql() {
     return new Tuple2(insertSql, [
       //
       this.id, //
@@ -151,7 +152,8 @@ class RacePhase implements HasJsonMap, HasCarNumbers, HasRaceMetaData {
       getCompatResultMs(), //
       this.loadMs,
       this.lastUpdateMs,
-      isDeleted
+      ModelFactory.boolAsInt(isDeleted)
+
     ]);
   }
 

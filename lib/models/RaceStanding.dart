@@ -1,6 +1,6 @@
 part of models;
 
-class RaceStanding {
+class RaceStanding implements HasRelational, HasCarNumbers{
   int id;
   String chartPosition;
   int raceBracketID;
@@ -11,6 +11,7 @@ class RaceStanding {
   int phase1DeltaMS; // planning transition to raceEntries
   int phase2DeltaMS; // planning transition
   RacePair racePair;
+  bool isDeleted;
 
   RaceStanding({car1: int, car2: int}) : racePair = new RacePair(car1, car2);
 
@@ -33,6 +34,9 @@ class RaceStanding {
         car1: jsonMap["carNumber1"], car2: jsonMap["carNumber2"]);
     RacePhase.marshallRaceEntryList(phase2DeltaMS, phase2EntryList,
         car1: jsonMap["carNumber1"], car2: jsonMap["carNumber2"]);
+
+
+    this.isDeleted=parseIsDeleted(jsonMap["isDeleted"]);
   }
 
   @override
@@ -45,7 +49,7 @@ class RaceStanding {
         new DateTime.fromMillisecondsSinceEpoch(this.lastUpdateMS, isUtc: true)
             .toLocal();
     var formattedDate = new DateFormat.Hms().format(date);
-    String bracketName = null;
+    String bracketName ;
     if (bracketMap != null) {
       bracketName = bracketMap[raceBracketID]?.raceName;
     }
@@ -63,9 +67,7 @@ class RaceStanding {
     return !isPending(rs);
   }
 
-  Tuple2<String, List> generateSqlx(int isDeleted) {
-    return null;
-  }
+
 
   static String selectSql =
       "select * from RaceStanding where isDeleted=0 and isPending=0 order by lastUpdateMS desc";
@@ -76,7 +78,7 @@ class RaceStanding {
   static const String createSql =
       "CREATE TABLE RaceStanding(id INTEGER PRIMARY KEY, chartPosition TEXT, raceBracketID Integer, carNumber1 integer, carNumber2 integer, phase1DeltaMS integer, phase2DeltaMS integer, lastUpdateMS integer ,  isPending INTEGER, isDeleted INTEGER) ";
 
-  Tuple2<String, List<dynamic>> generateSql(int isDeleted) {
+  Tuple2<String, List<dynamic>> generateSql() {
     return new Tuple2(insertSql, [
       //
       this.id, //
@@ -88,7 +90,7 @@ class RaceStanding {
       this.phase2DeltaMS,
       this.lastUpdateMS,
       ModelFactory.boolAsInt(isPending(this)),
-      isDeleted
+      ModelFactory.boolAsInt(isDeleted)
     ]);
   }
 

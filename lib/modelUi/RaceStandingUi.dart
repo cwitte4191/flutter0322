@@ -34,7 +34,7 @@ class RaceStandingUi implements DisplayableRace {
 
   @override
   RaceMetaData getRaceMetaData() {
-    return raceStanding.getRaceMetaData(bracketMap:globals.globalDerby.bracketMap);
+    return raceStanding.getRaceMetaData(bracketMap:globals.globalDerby.getRaceBrakcetCache());
   }
 
   int addResultTime(ResultsSummary resultsSummary, String phaseLiteral,
@@ -44,7 +44,7 @@ class RaceStandingUi implements DisplayableRace {
       resultsSummary.addMessage(racePair.car2, "$phaseLiteral: Tied");
       return null;
     }
-    int winningCar = null;
+    int winningCar ;
     if (winningMS < 0) {
       winningCar = raceStanding.racePair.car2;
     }

@@ -3,14 +3,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
 //import 'package:color/color.dart';
+import 'package:flutter0322/globals.dart' as globals;
 
 class RaceResultWidget extends StatelessWidget {
   final double f1 = 1.8;
   final DisplayableRace displayableRace;
   final TextStyle timeStyle=new TextStyle(color:Colors.blueGrey);
 
-  final Map<int, Racer> driverMap;
-  RaceResultWidget({Key, key, this.displayableRace, this.driverMap})
+  RaceResultWidget({Key, key, this.displayableRace})
       : assert(displayableRace != null),
         super(key: key) {}
 
@@ -31,7 +31,7 @@ class RaceResultWidget extends StatelessWidget {
     Widget tableWidget = new Table(
         columnWidths: tcw,
         //border: new TableBorder.all(),
-        children: getChildTableRows(displayableRace, driverMap));
+        children: getChildTableRows(displayableRace));
     return new Card(child: tableWidget, color: bgColor);
   }
 
@@ -71,7 +71,8 @@ class RaceResultWidget extends StatelessWidget {
         image: new AssetImage("images/finish_flag.png"));
   }
 
-  List<TableRow> getChildTableRows(DisplayableRace displayableRace, Map<int,Racer> driverMap) {
+  List<TableRow> getChildTableRows(DisplayableRace displayableRace) {
+    Map<int,Racer> driverMap=globals.globalDerby.getRacerCache();
     var rc = new List<TableRow>();
 
     if (displayableRace.getRaceMetaData().chartPosition != null) {

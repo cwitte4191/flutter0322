@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter0322/appPages/RaceHistoryPage.dart';
+import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/widgets/RaceResultWidget.dart';
@@ -56,7 +56,7 @@ class RaceStandingPageState extends State<RaceStandingPage> {
 
     RaceStandingUi raceStandingUi = new RaceStandingUi(raceStanding);
     RaceResultWidget rrw = new RaceResultWidget(
-        displayableRace: raceStandingUi, driverMap: globals.globalDerby.racerMap);
+        displayableRace: raceStandingUi);
     return rrw;
   }
 }

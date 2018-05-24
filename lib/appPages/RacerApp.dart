@@ -22,7 +22,6 @@ class RacerHomeState extends State<RacerHome> {
   List<Map<String,dynamic>> racerDbMap=[];
 
   BuildContext lastContext;
-   Map<int,Racer> racerMap=globals.globalDerby.racerMap;
   RacerHomeState({this.title="Racers"});
 
   @override
@@ -47,7 +46,7 @@ class RacerHomeState extends State<RacerHome> {
     );
   }
   void requestRefresh(BuildContext context) async{
-    Map<int,Racer> racerMap=await new RefreshData().doRefresh( "Racer");
+    Map<int,Racer> racerMap=await new RefreshData().doRefresh( );
     Navigator.push(context,
         new MaterialPageRoute(builder: (context) => new RacerHome()));
   }

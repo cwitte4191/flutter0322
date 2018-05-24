@@ -11,8 +11,7 @@ import 'package:flutter0322/network/GetS3Object.dart';
 class BracketList extends StatelessWidget {
   final String title;
   BuildContext lastContext;
-  final Map<int, RaceBracket> bracketMap;
-  BracketList({this.title = "Brackets", this.bracketMap}) {}
+  BracketList({this.title = "Brackets"}) {}
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class BracketList extends StatelessWidget {
         title: new Text(title),
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
-      body: new DerbyBodyWidgets().getBracketListBody(bracketMap),
+      body: new DerbyBodyWidgets().getBracketListBody(),
       floatingActionButton: new FloatingActionButton(
         onPressed: () => print("TODO: handle press")
             //requestRefresh(context)

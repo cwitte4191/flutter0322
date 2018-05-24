@@ -46,11 +46,12 @@ class RacePhasePageState extends State<RacePhasePage> {
   }
 
   Widget racePhaseItemBuilder(BuildContext context, int index) {
+
     RacePhase racePhase = new RacePhase.fromSqlMap(racePhaseList[index]);
 
     RacePhaseUi racePhaseUi = new RacePhaseUi(racePhase);
     RaceResultWidget rrw = new RaceResultWidget(
-        displayableRace: racePhaseUi, driverMap: globals.globalDerby.racerMap);
+        displayableRace: racePhaseUi);
     return rrw;
   }
 }

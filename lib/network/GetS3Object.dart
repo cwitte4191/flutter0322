@@ -216,8 +216,7 @@ typedef bool RefreshFilter(RaceStanding reHydrated);
 class RefreshData {
   RefreshFilter refreshFilter;
   RefreshData({this.refreshFilter});
-  Future<Map<int, T>> doRefresh<T>(String serializedName,
-      {RaceConfig raceConfig}) async {
+  Future<Map<int, T>> doRefresh<T>({RaceConfig raceConfig}) async {
     GetS3Object gs30 = new GetS3Object();
     if (raceConfig == null) {
       raceConfig = globals.globalDerby.raceConfig;
@@ -235,17 +234,19 @@ class RefreshData {
     globals.globalDerby.ndJsonPath = ndjson;
     ptime.add(DateTime.now().millisecondsSinceEpoch);
 
-    print("doRefresh begin: " + serializedName);
+    print("doRefresh begin. " );
     print(" ndjson: ${ndjson}");
 
     Stream<List<int>> inputStream = ndjson.openRead();
     int accumulatedBytes = 0;
 
+    /*
     bool stringFilter(String event) {
       var q = "\"";
       var pattern = new RegExp("${q}sn${q}:${q}${serializedName}${q}");
       return event.contains(pattern);
     }
+    */
 
     List<String> jj = await inputStream
         .transform(new Utf8Decoder())
@@ -261,9 +262,9 @@ class RefreshData {
     SplayTreeMap<int, T> rcMap = new SplayTreeMap();
 
     for (String line in jj) {
-      if (stringFilter(line)) {
-        parseLine(line, serializedName, rcMap);
-      }
+     // if (stringFilter(line)) {
+      //  parseLine(line, serializedName, rcMap);
+     // }
       ModelFactory.loadDb(line);
     }
 
@@ -279,12 +280,14 @@ class RefreshData {
 
     }
     */
+    /*
     if (serializedName == "Racer") {
       globals.globalDerby.racerMap = rcMap as Map<int, Racer>;
     }
     if (serializedName == "RaceBracket") {
       globals.globalDerby.bracketMap = rcMap as Map<int, RaceBracket>;
     }
+    */
     print("doRefresh: done2 await: ${ndjson} map size: " +
         rcMap.length.toString());
 

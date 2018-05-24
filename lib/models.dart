@@ -20,14 +20,21 @@ part 'models/RaceBracket.dart';
 
 enum ResultStatus { WIN, LOSE, TIE, INCOMPLETE }
 
+ bool parseIsDeleted(var input){
+  if(input !=null && input==1) return true;
 
+  return false;
+}
 
 abstract class HasCarNumbers {
   List<int> getCarNumbers();
 }
 
 
-
+abstract class  HasRelational{
+  Tuple2<String, List<dynamic>> generateSql();
+  bool get isDeleted;
+}
 
 abstract class  HasJsonMap {
   Map toJson();
