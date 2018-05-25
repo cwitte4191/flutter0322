@@ -234,7 +234,7 @@ class RefreshData {
     globals.globalDerby.ndJsonPath = ndjson;
     ptime.add(DateTime.now().millisecondsSinceEpoch);
 
-    print("doRefresh begin. " );
+    print("doRefresh begin. ");
     print(" ndjson: ${ndjson}");
 
     Stream<List<int>> inputStream = ndjson.openRead();
@@ -248,52 +248,30 @@ class RefreshData {
     }
     */
 
-    List<String> jj = await inputStream
+    Stream<String> lineStream = await inputStream
         .transform(new Utf8Decoder())
-        .transform(new LineSplitter())
-        //.where(stringFilter)
-        .toList();
+        .transform(new LineSplitter());
+    await republishStream(lineStream);
+    //.where(stringFilter)
+    //.toList();
     ;
     ptime.add(DateTime.now().millisecondsSinceEpoch);
-
-    print("jj matching strings:" + jj.length.toString());
-
-    int count = 0;
     SplayTreeMap<int, T> rcMap = new SplayTreeMap();
 
-    for (String line in jj) {
-     // if (stringFilter(line)) {
-      //  parseLine(line, serializedName, rcMap);
-     // }
-      ModelFactory.loadDb(line);
-    }
-
-    print("jj mapSize :" + rcMap.length.toString());
-    ptime.add(DateTime.now().millisecondsSinceEpoch);
-
-    /*
-    await for (var line in lines) {
-      count++;
-      print("line:" + count.toString() + " " + line);
-      continue; //TODO: wip to see why we error.
-      parseLine(line,serializedName,rcMap);
-
-    }
-    */
-    /*
-    if (serializedName == "Racer") {
-      globals.globalDerby.racerMap = rcMap as Map<int, Racer>;
-    }
-    if (serializedName == "RaceBracket") {
-      globals.globalDerby.bracketMap = rcMap as Map<int, RaceBracket>;
-    }
-    */
-    print("doRefresh: done2 await: ${ndjson} map size: " +
-        rcMap.length.toString());
-
-    gs30.reportElapsed(ptime, "doRefresh");
-
     return rcMap;
+  }
+
+  Future<int> republishStream(Stream<String> stream) async {
+    var sum = 0;
+    try {
+      await for (var line in stream) {
+        print("republishStream: $line");
+        ModelFactory.loadDb(line);
+      }
+    } catch (e) {
+      return -1;
+    }
+    return sum;
   }
 
   void parseLine<T>(String line, String serializedName, Map<int, T> rcMap) {
@@ -392,13 +370,15 @@ class RaceConfig {
   final String applicationUrl;
   final String s3BucketUrlPrefix;
   RaceConfig({this.applicationUrl, this.s3BucketUrlPrefix, this.raceName}) {}
-  static RaceConfig fromXml(String xmlString,{String raceName}) {
+  static RaceConfig fromXml(String xmlString, {String raceName}) {
     var document = xml.parse(xmlString);
     print("RaceConfig fromXml: " + document.toString());
     String applicationUrl = getTextForTag(document, "applicationUrl");
     String s3BucketUrlPrefix = getTextForTag(document, "s3BucketUrlPrefix");
     return new RaceConfig(
-        applicationUrl: applicationUrl, s3BucketUrlPrefix: s3BucketUrlPrefix, raceName:raceName);
+        applicationUrl: applicationUrl,
+        s3BucketUrlPrefix: s3BucketUrlPrefix,
+        raceName: raceName);
   }
 
   static String getTextForTag(XmlDocument doc, String tag) {
