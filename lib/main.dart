@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter0322/appPages/RacerPage.dart';
+import 'package:flutter0322/appPages/SplashPage.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
 
@@ -30,10 +31,11 @@ void main() async {
     globals.globalDerby = new globals.GlobalDerby(raceConfig: restoredRC);
     await globals.globalDerby.init(false);
 
+    homeWidget=new RacerHome();
   }
 
   if(globals.globalDerby.raceConfig==null){
-    homeWidget=null;
+    homeWidget=new SplashScreen();
 
   }
 
@@ -45,8 +47,10 @@ void main() async {
       theme: new ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: //RaceSelectionWidget.getLoadingDialog()
-     new RacerHome(),
+      home: homeWidget,
+    routes: <String, WidgetBuilder>{
+      '/HomeScreen': (BuildContext context) => new RacerHome()
+    },
     ));
   }
 
