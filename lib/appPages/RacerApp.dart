@@ -55,13 +55,12 @@ class RacerHomeState extends State<RacerHome> {
 
 
   Widget racerItemBuilder(BuildContext context, int index) {
-    print("racerItemBuilder $index of ${racerDbMap.length}");
+    //print("racerItemBuilder $index of ${racerDbMap.length}");
     Color bg = index % 2 == 0 ? Colors.grey : null;
 
-    Racer racer=new Racer.fromSqlMap(racerDbMap[index]);
+    Racer racer=new Racer.fromJson(racerDbMap[index]);
     print("racerItemBuilder $index racer: ${racer.toJson()}");
 
-    Racer testr=new Racer()..carNumber=997..racerName="testr $index";
     return new RacerWidget(
       racer: racer,
       bgColor: bg,

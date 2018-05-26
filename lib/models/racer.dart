@@ -1,10 +1,10 @@
 part of models;
 
 class Racer implements HasJsonMap, HasRelational {
-  String racerName;
-  int carNumber;
+  final String racerName;
+  final int carNumber;
 
-  bool isDeleted;
+  final bool isDeleted;
   @override
   int get hashCode {
     return carNumber.hashCode;
@@ -22,24 +22,13 @@ class Racer implements HasJsonMap, HasRelational {
     return {"racerName": racerName, "carNumber": carNumber};
   }
 
-  Racer({this.racerName, this.carNumber});
+  Racer({this.racerName, this.carNumber, this.isDeleted});
 
-  Racer.fromSqlMap(Map rawMap) {
-    initFromMap(rawMap);
-  }
-
-  Racer.fromJsonMap(Map jsonMap) {
-    initFromMap(jsonMap);
-  }
-  initFromMap(Map jsonMap) {
-
-    this.racerName = jsonMap["firstName"] != null
-        ? jsonMap["firstName"]
-        : jsonMap["racerName"];
-
-    this.carNumber = jsonMap["carNumber"];
-    this.isDeleted = parseIsDeleted(jsonMap["isDeleted"]);
-  }
+  Racer.fromJson(Map<String, dynamic> json)
+      : carNumber = json["carNumber"],
+        racerName =
+            json["firstName"] != null ? json["firstName"] : json["racerName"],
+        isDeleted = parseIsDeleted(json["isDeleted"]);
 
   static String selectSql =
       "select * from Racer where isDeleted=0 order by carNumber";

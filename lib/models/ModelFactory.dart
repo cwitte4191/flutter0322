@@ -17,7 +17,7 @@ class ModelFactory {
     HasRelational rc;
     switch (serializedName) {
       case "Racer":
-        rc = new Racer.fromJsonMap(jsonMap["data"]);
+        rc = new Racer.fromJson(jsonMap["data"]);
         break;
       case "RacePhase":
         rc = new RacePhase.fromJsonMap(jsonMap["data"]);
@@ -27,6 +27,9 @@ class ModelFactory {
         break;
       case "RaceBracket":
         rc = new RaceBracket.fromJsonMap(jsonMap["data"]);
+        if((rc as RaceBracket).id ==null){
+          rc=null;
+        }
     }
 
     //print("ModelFactory: publishing:  $rc");

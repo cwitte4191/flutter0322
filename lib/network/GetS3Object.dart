@@ -7,11 +7,7 @@ import 'package:flutter0322/models/ModelFactory.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:xml/xml/nodes/document.dart';
-import 'package:archive/archive.dart';
-import 'package:path/path.dart';
 import 'package:flutter0322/globals.dart' as globals;
-
-import 'package:semaphore/semaphore.dart';
 
 class GetS3Object {
   Future<Map<String, String>> getS3BucketList(String targetUrl) async {
@@ -64,6 +60,10 @@ class GetS3Object {
 
   Future<File> ndJsonFile() async {
     return _localFile(fileName: "dataLog.ndjson");
+  }
+
+  Future<File> raceConfigFile() async {
+    return _localFile(fileName: "raceConfig.ndjson");
   }
 
   Future<File> _localFile({fileName = "foo"}) async {
@@ -274,80 +274,6 @@ class RefreshData {
     return sum;
   }
 
-  void parseLine<T>(String line, String serializedName, Map<int, T> rcMap) {
-    var foo = JSON.decode(line);
-    bool isDeleted = foo["type"] == "Remove";
-
-    //print("sn:" + foo["sn"]);
-    if (foo["sn"] != serializedName) {
-      return;
-    }
-
-    if (serializedName == "Racer") {
-      Racer r = new Racer.fromJsonMap(foo["data"]);
-      //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      if (isDeleted) {
-        rcMap.remove(r.carNumber);
-      } else {
-        rcMap[r.carNumber] = (r as T);
-      }
-      //globals.globalDerby.derbyDb.execute(r.generateSql(isDeleted));
-    }
-
-    if (serializedName == "RacePhase") {
-      RacePhase r = new RacePhase.fromJsonMap(foo["data"]);
-      //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      if (isDeleted) {
-        rcMap.remove(r.id);
-      } else {
-        rcMap[r.id] = (r as T);
-      }
-      //globals.globalDerby.derbyDb.execute(r.generateSql(isDeleted));
-
-    }
-    if (serializedName == "RaceStanding") {
-      RaceStanding r = new RaceStanding.fromJsonMap(foo["data"]);
-      //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      bool filterRc = false;
-      if (refreshFilter != null) {
-        filterRc = !refreshFilter(r);
-      }
-      if (isDeleted || filterRc) {
-        rcMap.remove(r.id);
-      } else {
-        rcMap[r.id] = (r as T);
-      }
-    }
-    if (serializedName == "RaceBracket") {
-      RaceBracket r = new RaceBracket.fromJsonMap(foo["data"]);
-
-      if (r.id == null) {
-        // happens on persist, ,not merge!?
-        return;
-      }
-      //print("Racer:" + r.carNumber.toString() + " : " + r.racerName);
-      if (isDeleted) {
-        rcMap.remove(r.id);
-      } else {
-        rcMap[r.id] = (r as T);
-      }
-    }
-  }
-  /*
-  void setStateFoo(VoidCallback fn) {
-    print("setState list size prior:" + list.length.toString());
-    fn();
-    print("setState list size post:" + list.length.toString());
-  }
-
-  List<Racer> list = [];
-  void streamFrom() {
-    StreamController<Racer> streamController = new StreamController.broadcast();
-    streamController.stream.listen((p) => setStateFoo(() => list.add(p)));
-    load(streamController);
-  }
-  */
-
   void load(StreamController<Racer> sc) async {
     String url = "";
     var client = new HttpClient();
@@ -359,7 +285,7 @@ class RefreshData {
         .transform(new Utf8Decoder())
         .transform(json.decoder)
         .expand((e) => e)
-        .map((map) => Racer.fromJsonMap(map))
+        .map((map) => Racer.fromJson(map))
         .pipe(sc);
     ;
   }
@@ -370,7 +296,17 @@ class RaceConfig {
   final String applicationUrl;
   final String s3BucketUrlPrefix;
   RaceConfig({this.applicationUrl, this.s3BucketUrlPrefix, this.raceName}) {}
-  static RaceConfig fromXml(String xmlString, {String raceName}) {
+  RaceConfig.fromJson(Map<String, dynamic> json)
+      : raceName = json["raceName"],
+        applicationUrl = json["applicationUrl"],
+        s3BucketUrlPrefix = json["s3BucketUrlPrefix"];
+  Map<String, dynamic> toJson() =>
+      {
+        'raceName': raceName,
+        'applicationUrl': applicationUrl,
+        's3BucketUrlPrefix': s3BucketUrlPrefix,
+      };
+  static RaceConfig fromXml({String xmlString, String raceName}) {
     var document = xml.parse(xmlString);
     print("RaceConfig fromXml: " + document.toString());
     String applicationUrl = getTextForTag(document, "applicationUrl");
@@ -379,6 +315,40 @@ class RaceConfig {
         applicationUrl: applicationUrl,
         s3BucketUrlPrefix: s3BucketUrlPrefix,
         raceName: raceName);
+  }
+
+  Future persistToFile() async {
+    File rcFile = await new GetS3Object().raceConfigFile();
+    var json = new JsonCodec();
+    String jsonString = json.encode(this);
+    print("persistToFile:  rcFile: ${rcFile.toString()} $jsonString");
+
+    var oStream = await rcFile.openWrite();
+    await oStream.write(jsonString);
+    await oStream.close();
+  }
+
+  static Future<RaceConfig> restoreRaceConfig() async {
+    File rcFile = await new GetS3Object().raceConfigFile();
+    if (!rcFile.existsSync()) {
+      print("restoreRaceConfig: no rcFile: ${rcFile.toString()}");
+
+      return null;
+    }
+    Stream<List<int>> inputStream = await rcFile.openRead();
+
+    String line = await inputStream
+        .transform(new Utf8Decoder())
+        .transform(new LineSplitter())
+        .first;
+    if (line == null) {
+      print("restoreRaceConfig: unable to restore raceConfig");
+      return null;
+    }
+    var json = JSON.decode(line);
+    print("restoreRaceConfig: found rcFile: $json");
+
+    return new RaceConfig.fromJson(json);
   }
 
   static String getTextForTag(XmlDocument doc, String tag) {

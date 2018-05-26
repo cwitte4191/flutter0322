@@ -1,4 +1,5 @@
 library models;
+
 import 'dart:math';
 import 'dart:collection';
 import 'package:flutter/material.dart';
@@ -13,15 +14,14 @@ part 'models/RacePhase.dart';
 part 'models/RaceStanding.dart';
 part 'models/RaceBracket.dart';
 
-
 //import 'package:json_object/json_object.dart';
 //import 'package:dartson/dartson.dart';
 
-
 enum ResultStatus { WIN, LOSE, TIE, INCOMPLETE }
 
- bool parseIsDeleted(var input){
-  if(input !=null && input==1) return true;
+
+bool parseIsDeleted(var input) {
+  if (input != null && input == 1) return true;
 
   return false;
 }
@@ -30,29 +30,30 @@ abstract class HasCarNumbers {
   List<int> getCarNumbers();
 }
 
-
-abstract class  HasRelational{
+abstract class HasRelational {
   Tuple2<String, List<dynamic>> generateSql();
   bool get isDeleted;
 }
 
-abstract class  HasJsonMap {
+abstract class HasJsonMap {
   Map toJson();
 }
 
-abstract class HasRaceMetaData
-{
-
+abstract class HasRaceMetaData {
   RaceMetaData getRaceMetaData();
 }
+
 enum PhaseStatus { pending, complete, error }
 
-class RaceMetaData{
-
+class RaceMetaData {
   final PhaseStatus phaseStatus;
   final String raceUpdateTime;
   final String chartPosition;
   final String raceBracketName;
 
-  RaceMetaData({this.raceBracketName,this.chartPosition,this.raceUpdateTime, this.phaseStatus});
+  RaceMetaData(
+      {this.raceBracketName,
+      this.chartPosition,
+      this.raceUpdateTime,
+      this.phaseStatus});
 }

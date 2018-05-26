@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter0322/appPages/RacerApp.dart';
 import 'package:flutter0322/models.dart';
+import 'package:flutter0322/network/GetS3Object.dart';
 
 import 'dart:async';
 
@@ -11,7 +12,7 @@ import 'package:flutter0322/widgets/RaceSelectionWidget.dart';
 //import 'mqtt.dart';
 //import 'package:pubsub/pubsub.dart';
 
-void main() {
+void main() async {
   //new GetS3Object().writeCounter(77);
   //new GetS3Object().getS3ObjectAsFile("foo");
 
@@ -24,10 +25,18 @@ void main() {
  // var racerMap=new TestData().getTestRacers();
   Map<int,Racer> racerMap=new Map();
   Widget homeWidget=null;
+  RaceConfig restoredRC=await RaceConfig.restoreRaceConfig();
+  if(restoredRC !=null) {
+    globals.globalDerby = new globals.GlobalDerby(raceConfig: restoredRC);
+    await globals.globalDerby.init(false);
+
+  }
+
   if(globals.globalDerby.raceConfig==null){
     homeWidget=null;
 
   }
+
 
 
 

@@ -20,7 +20,7 @@ class DerbyDbCache<T extends HasRelational>{
     var sqlRows=await derbyDb?.database?.rawQuery(Racer.getSelectSql());
 
     for(var row in sqlRows){
-      Racer r=Racer.fromSqlMap(row);
+      Racer r=Racer.fromJson(row);
       cacheMap[r.carNumber]=r;
     }
   }

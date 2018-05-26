@@ -7,7 +7,7 @@ class TestData{
   Map<int,Racer> getTestRacers(){
     var rc=new SplayTreeMap<int,Racer>();
     for(var x=0;x<1000;x++){
-      rc[x]=new Racer()..carNumber=x..racerName=x.toString()+" "+x.toString()+":"+x.toString();
+      rc[x]=new Racer(carNumber:x,racerName:x.toString()+" "+x.toString()+":"+x.toString());
     }
 
 

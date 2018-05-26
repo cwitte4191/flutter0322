@@ -63,7 +63,7 @@ class RaceSelectionWidget extends StatelessWidget {
     print("Tapped: ${fullPath}");
     _onLoading(context);
     String response = await new GetS3Object().getS3ObjectAsString(fullPath);
-    RaceConfig raceConfig = RaceConfig.fromXml(response, raceName: displayedText);
+    RaceConfig raceConfig = RaceConfig.fromXml(xmlString: response, raceName: displayedText);
 
     if (raceConfig.applicationUrl.isEmpty) {
       print("Redisplaying list with bucket ${raceConfig.s3BucketUrlPrefix}");
@@ -77,6 +77,7 @@ class RaceSelectionWidget extends StatelessWidget {
           await new RefreshData().doRefresh(raceConfig: raceConfig);
       //globals.globalDerby.derbyDb.testBroadcastSink();
 
+      raceConfig.persistToFile();
       Navigator.push(context,
           new MaterialPageRoute(builder: (context) => new RacerHome()));
     }

@@ -107,10 +107,10 @@ class DerbyBodyWidgets {
     racePhaseT2.phaseNumber = 2;
 
     var driverMap = new Map<int, Racer>();
-    driverMap[101] = new Racer()..racerName = "Bugs";
-    driverMap[201] = new Racer()..racerName = "Bunny";
-    driverMap[202] = new Racer()..racerName = "Elmer";
-    driverMap[102] = new Racer()..racerName = "Fudd";
+    driverMap[101] = new Racer(racerName:"Bugs");
+    driverMap[201] = new Racer(racerName:"Bunny");
+    driverMap[202] = new Racer(racerName : "Elmer");
+    driverMap[102] = new Racer(racerName : "Fudd");
 
     var rpList = new List<Widget>();
     for (int x = 0; x < 50; x++) {

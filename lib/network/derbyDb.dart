@@ -24,6 +24,10 @@ class DerbyDb {
     if (!dbFile.existsSync() || doReset) {
       await deleteAndDefine();
     }
+    else{
+      print ("DerbyDb reusing existing db");
+      await openDb();
+    }
   }
 
   void createFromNetworkStream() {
@@ -66,23 +70,8 @@ class DerbyDb {
 
     print("deleteAndDefine: opening.");
 
-    // open the database
-    database =
-    await openDatabase(dbPath, version: 2, onOpen: (Database db) async {
-      print("deleteAndDefine: onOpen Beginning.");
-    }, onCreate: (Database db, int version) async {
-      print("deleteAndDefine: onCreate Beginning.");
 
-      // When creating the db, create the table
-      await db.execute(
-        //    "CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
-          "CREATE TABLE Derby (id INTEGER PRIMARY KEY, datatype TEXT, json TEXT)");
-      await db.execute(Racer.getCreateSql());
-      await db.execute(RacePhase.getCreateSql());
-      await db.execute(RaceStanding.getCreateSql());
-      await db.execute(RaceBracket.getCreateSql());
-      print("deleteAndDefine: create complete.");
-    });
+    await  openDb();
 
     ;
     print("deleteAndDefine: inserting");
@@ -114,6 +103,26 @@ class DerbyDb {
     await execute(model.generateSql());
     recentWatch.receivedInput(this,model.runtimeType.toString());
 
+  }
+
+  Future openDb() async {
+    // open the database
+    database =
+    await openDatabase(dbPath, version: 2, onOpen: (Database db) async {
+      print("deleteAndDefine: onOpen Beginning.");
+    }, onCreate: (Database db, int version) async {
+      print("deleteAndDefine: onCreate Beginning.");
+
+      // When creating the db, create the table
+      await db.execute(
+        //    "CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
+          "CREATE TABLE Derby (id INTEGER PRIMARY KEY, datatype TEXT, json TEXT)");
+      await db.execute(Racer.getCreateSql());
+      await db.execute(RacePhase.getCreateSql());
+      await db.execute(RaceStanding.getCreateSql());
+      await db.execute(RaceBracket.getCreateSql());
+      print("deleteAndDefine: create complete.");
+    });
   }
 }
 class RecentWatch{
