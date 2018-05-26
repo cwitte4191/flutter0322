@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter0322/appPages/DbRefreshAid.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/widgets/RaceResultWidget.dart';
@@ -11,10 +12,13 @@ class RacePhasePage extends StatefulWidget {
   }
 }
 
-class RacePhasePageState extends State<RacePhasePage> {
+class RacePhasePageState extends State<RacePhasePage> implements DbRefreshAid {
   String title;
   List<Map<String, dynamic>> racePhaseList = [];
 
+  RacePhasePageState() {
+    DbRefreshAid.dbAidWatchForNextChange(this, "RacePhase");
+  }
   @override
   Widget build(BuildContext context) {
     Widget bodyWidgets;
@@ -26,19 +30,11 @@ class RacePhasePageState extends State<RacePhasePage> {
   }
 
   Widget getRacePhaseHistoryBodyFromDB() {
-    void repopulate(final List<Map<String, dynamic>> list2) {
-      print("RacePhase: repopulateList! $list2");
 
-      setState(() {
-        racePhaseList = list2;
-      });
-    }
 
     if (racePhaseList?.length == 0) {
       // TODO: we seem to be recursing w/o this!?
-      globals.globalDerby.derbyDb?.database
-          ?.rawQuery(RacePhase.getSelectSql())
-          ?.then((list) => repopulate(list));
+      queryDataFromDb();
     }
 
     return ListView.builder(
@@ -53,5 +49,21 @@ class RacePhasePageState extends State<RacePhasePage> {
     RaceResultWidget rrw = new RaceResultWidget(
         displayableRace: racePhaseUi);
     return rrw;
+  }
+  @override
+  bool queryDataFromDb() {
+    globals.globalDerby.derbyDb?.database
+        ?.rawQuery(RacePhase.getSelectSql())
+        ?.then((list) {
+      print("RacePhase: repopulateList! $list");
+
+      if(this.mounted) {
+        setState(() {
+          racePhaseList = list;
+        });
+      }
+    });
+    return this.mounted;
+
   }
 }

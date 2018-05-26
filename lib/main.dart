@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter0322/appPages/RacerApp.dart';
+import 'package:flutter0322/appPages/RacerPage.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
 

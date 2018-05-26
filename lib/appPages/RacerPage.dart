@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter0322/DerbyNavDrawer.dart';
+import 'package:flutter0322/appPages/DbRefreshAid.dart';
 
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
@@ -13,24 +14,13 @@ class RacerHome extends StatefulWidget {
   }
 }
 
-class RacerHomeState extends State<RacerHome> {
+class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
   final String title;
   List<Map<String, dynamic>> racerDbMap = [];
 
   BuildContext lastContext;
   RacerHomeState({this.title = "Racers"}) {
-    watchForNextChange();
-  }
-
-  // only do one at a time...  hackish? way to avoid missing unsubscribe.
-  void watchForNextChange() {
-    globals.globalDerby.derbyDb.recentChangesController.stream
-        .firstWhere((tableName)=>tableName == "Racer")
-        .then((String tableName) {
-      print("watchForNextChange: Match from stream: $tableName");
-      queryRacersFromDb();
-      watchForNextChange();
-    });
+    DbRefreshAid.dbAidWatchForNextChange(this, "Racer");
   }
 
   @override
@@ -75,24 +65,26 @@ class RacerHomeState extends State<RacerHome> {
   Widget getRacerListBodyFromDB() {
     if (racerDbMap?.length == 0) {
       // TODO: we seem to be recurse ing w/o this!?
-      queryRacersFromDb();
+      queryDataFromDb();
     }
 
     return ListView.builder(
         itemBuilder: racerItemBuilder, itemCount: racerDbMap?.length);
   }
 
-  void queryRacersFromDb() {
+  @override
+  bool queryDataFromDb() {
     globals.globalDerby.derbyDb?.database
         ?.rawQuery(Racer.getSelectSql())
         ?.then((list) {
-      print("repopulateList! $list");
+      print("queryDataFromDb repopulate Racers! ${list.length}");
 
-      setState(() {
-        racerDbMap = list;
-      });
+      if (mounted) {
+        setState(() {
+          racerDbMap = list;
+        });
+      }
     });
+    return this.mounted;
   }
-
-
 }

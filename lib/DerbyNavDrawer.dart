@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter0322/appPages/BracketList.dart';
 import 'package:flutter0322/appPages/RaceSelection2.dart';
-import 'package:flutter0322/appPages/RacerApp.dart';
+import 'package:flutter0322/appPages/RacerPage.dart';
 import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
 import 'package:flutter0322/globals.dart' as globals;
 

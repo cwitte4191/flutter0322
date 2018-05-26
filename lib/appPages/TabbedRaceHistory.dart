@@ -87,11 +87,12 @@ class _TabbedRaceHistoryState extends State<TabbedRaceHistory> with SingleTicker
   }
   void requestRefresh(BuildContext context) async{
     await new RefreshData().doRefresh();
-
+/*
     Navigator.push(
         context,
         new MaterialPageRoute(
             builder: (context) => new TabbedRaceHistory()));
+            */
 
   }
 

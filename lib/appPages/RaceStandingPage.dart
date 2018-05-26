@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter0322/appPages/DbRefreshAid.dart';
 import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
@@ -15,10 +16,13 @@ class RaceStandingPage extends StatefulWidget {
   }
 }
 
-class RaceStandingPageState extends State<RaceStandingPage> {
+class RaceStandingPageState extends State<RaceStandingPage>
+    implements DbRefreshAid {
   final HistoryType historyType;
 
-  RaceStandingPageState({this.historyType});
+  RaceStandingPageState({this.historyType}) {
+    DbRefreshAid.dbAidWatchForNextChange(this, "Racer");
+  }
   List<Map<String, dynamic>> raceStandingList = [];
 
   @override
@@ -31,32 +35,40 @@ class RaceStandingPageState extends State<RaceStandingPage> {
   }
 
   Widget getRaceStandingHistoryBodyFromDB() {
-    void repopulate(final List<Map<String, dynamic>> list2) {
-      print("RaceStanding: repopulateList! $list2");
-
-      setState(() {
-        raceStandingList = list2;
-      });
-    }
-
+    // TODO: we seem to be recurse  ing w/o this!?
     if (raceStandingList?.length == 0) {
-      bool getPending=(historyType==HistoryType.Pending);
-      // TODO: we seem to be recursing w/o this!?
-      globals.globalDerby.derbyDb?.database
-          ?.rawQuery(RaceStanding.getSelectSql(getPending))
-          ?.then((list) => repopulate(list));
+      queryDataFromDb();
     }
 
     return ListView.builder(
-        itemBuilder: raceStandingItemBuilder, itemCount: raceStandingList?.length);
+        itemBuilder: raceStandingItemBuilder,
+        itemCount: raceStandingList?.length);
   }
 
   Widget raceStandingItemBuilder(BuildContext context, int index) {
-    RaceStanding raceStanding = new RaceStanding.fromSqlMap(raceStandingList[index]);
+    RaceStanding raceStanding =
+        new RaceStanding.fromSqlMap(raceStandingList[index]);
 
     RaceStandingUi raceStandingUi = new RaceStandingUi(raceStanding);
-    RaceResultWidget rrw = new RaceResultWidget(
-        displayableRace: raceStandingUi);
+    RaceResultWidget rrw =
+        new RaceResultWidget(displayableRace: raceStandingUi);
     return rrw;
+  }
+
+  @override
+  bool queryDataFromDb() {
+    bool getPending = (historyType == HistoryType.Pending);
+    globals.globalDerby.derbyDb?.database
+        ?.rawQuery(RaceStanding.getSelectSql(getPending))
+        ?.then((list) {
+      print("RaceStanding: repopulateList! $list");
+
+      if(this.mounted) {
+        setState(() {
+          raceStandingList = list;
+        });
+      }
+    });
+    return this.mounted;
   }
 }
