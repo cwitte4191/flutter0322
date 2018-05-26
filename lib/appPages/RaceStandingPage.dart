@@ -21,7 +21,7 @@ class RaceStandingPageState extends State<RaceStandingPage>
   final HistoryType historyType;
 
   RaceStandingPageState({this.historyType}) {
-    DbRefreshAid.dbAidWatchForNextChange(this, "Racer");
+    DbRefreshAid.dbAidWatchForNextChange(this, "RaceStanding");
   }
   List<Map<String, dynamic>> raceStandingList = [];
 
