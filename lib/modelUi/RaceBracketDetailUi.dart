@@ -2,7 +2,10 @@ part of modelUi;
 
 class RaceBracketDetailUi {
   final RaceBracketDetail raceBracketDetail;
-  RaceBracketDetailUi(RaceBracketDetail raceBracketDetail):raceBracketDetail=raceBracketDetail ;
+  RaceBracketDetailUi(RaceBracketDetail raceBracketDetail)
+      : raceBracketDetail = raceBracketDetail{
+    raceBracketDetail.populateOriginKeys();
+  }
 
   Map<String, List<DisplayableRace>> getDisplayableRaceByRound() {
     var rc = new Map<String, List<DisplayableRace>>();
@@ -10,7 +13,7 @@ class RaceBracketDetailUi {
       String round = heatDetail.raceDisposition.round;
 
       if (rc[round] == null) rc[round] = new List<HeatDetailUi>();
-      rc[round].add(new HeatDetailUi(heatDetail));
+      rc[round].add(new HeatDetailUi(heatDetail, raceBracketDetail));
     }
 
     raceBracketDetail.heatDetailMap.forEach(iterateMapEntry);
@@ -33,7 +36,7 @@ class RaceBracketDetailUi {
 class DisplayablePlace implements DisplayableRace {
   final String place;
   final int carNumber;
-  DisplayablePlace({this.carNumber, this.place}) : assert(carNumber != null) ;
+  DisplayablePlace({this.carNumber, this.place}) : assert(carNumber != null);
 
   @override
   List<int> getCarNumbers() {
@@ -67,13 +70,49 @@ class DisplayablePlace implements DisplayableRace {
 
 class HeatDetailUi implements DisplayableRace {
   final HeatDetail heatDetail;
-  HeatDetailUi(HeatDetail heatDetail) :heatDetail=heatDetail;
+  final RaceBracketDetail raceBracketDetail;
+  HeatDetailUi(HeatDetail heatDetail, RaceBracketDetail raceBracketDetail)
+      : heatDetail = heatDetail,
+        raceBracketDetail = raceBracketDetail;
 
   @override
   void getResultsSummary(ResultsSummary resultsSummary) {
     if (heatDetail.winner != null) {
-      resultsSummary.setIcon(
-          heatDetail.winner, RaceResultWidget.getFinishFlagWidget());
+      return getCompletedResultsSummary(resultsSummary);
+    } else {
+      return getPendingResultsSummary(resultsSummary);
+    }
+  }
+
+  void getPendingResultsSummary(ResultsSummary resultsSummary) {
+
+    String origin1=heatDetail.originKeyCar1;
+    String origin2=heatDetail.originKeyCar2;
+    origin1=(origin1==null)?"Seed":origin1;
+    origin2=(origin2==null)?"Seed":origin2;
+    resultsSummary.addMessage(null, "$origin1 vs. $origin2");
+  }
+
+  void getCompletedResultsSummary(ResultsSummary resultsSummary) {
+    resultsSummary.setIcon(
+        heatDetail.winner, RaceResultWidget.getFinishFlagWidget());
+
+    String roundDescription = raceBracketDetail
+        .getRoundDescription(heatDetail.raceDisposition.winDest);
+
+    resultsSummary.addMessage(heatDetail.winner, "To: $roundDescription");
+
+    int loser;
+    for (int carNumber in getCarNumbers()) {
+      if (carNumber != heatDetail.winner) {
+        loser = carNumber;
+      }
+    }
+    if (loser != null) {
+      String roundDescription = raceBracketDetail
+          .getRoundDescription(heatDetail.raceDisposition.loseDest);
+
+      resultsSummary.addMessage(loser, "To: $roundDescription");
     }
     return;
   }
@@ -87,6 +126,17 @@ class HeatDetailUi implements DisplayableRace {
 
   @override
   List<int> getCarNumbers() {
-    return heatDetail.getCarNumbers();
+    List<int> hdCars = heatDetail.getCarNumbers();
+
+    if (hdCars == null) {
+      hdCars = [-2, -2];
+    }
+    if (hdCars != null) {
+      if (hdCars[0] == null) hdCars[0] = -1;
+      if (hdCars[1] == null) hdCars[1] = -2;
+    }
+
+    return hdCars;
+    //return heatDetail.getCarNumbers();
   }
 }

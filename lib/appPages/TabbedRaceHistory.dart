@@ -86,14 +86,13 @@ class _TabbedRaceHistoryState extends State<TabbedRaceHistory> with SingleTicker
 
   }
   void requestRefresh(BuildContext context) async{
-    Map<int,RacePhase> racerMap=await new RefreshData().doRefresh();
+    await new RefreshData().doRefresh();
 
-    print("RacePhase reload size: "+racerMap.length.toString());
-    //TODO: change constructor
-    /*
-    Navigator.push(context,
-        new MaterialPageRoute(builder: (context) => new RaceHistoryPage(racePhaseMap: racerMap)));
-        */
+    Navigator.push(
+        context,
+        new MaterialPageRoute(
+            builder: (context) => new TabbedRaceHistory()));
+
   }
 
 

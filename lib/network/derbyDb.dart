@@ -33,9 +33,7 @@ class DerbyDb {
   void createFromNetworkStream() {
     fromNetworkController = StreamController.broadcast<HasRelational>();
 
-    // this is expected to go undelivered, b/c of broadcast w/o listener rule in dart.
-    fromNetworkController.add(
-        new Racer(carNumber: 901, racerName: "Hardcoded"));
+
 
     fromNetworkController.stream.forEach((model) =>  addNewModel(model));
   }

@@ -10,7 +10,7 @@ class RacerWidget extends StatelessWidget {
         super(key: key) ;
   @override
   Widget build(BuildContext context) {
-    print("RacerWidget: ${racer.toJson()}");
+    //print("RacerWidget: ${racer.toJson()}");
     return new Container(
         color: bgColor,
         child: new Row(

@@ -30,6 +30,7 @@ class TabbedBracket extends StatelessWidget {
           appBar: new AppBar(
             bottom: new TabBar(
               tabs: tabBarWidgets,
+              isScrollable: true,
             ),
             title: new Text(raceBracketDetailUi.raceBracketDetail.raceTitle),
           ),

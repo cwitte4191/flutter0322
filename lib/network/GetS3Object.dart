@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 import 'dart:convert';
-import 'package:flutter0322/models.dart';
 import 'package:flutter0322/models/ModelFactory.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:xml/xml.dart' as xml;
@@ -15,7 +14,7 @@ class GetS3Object {
     var uri = new Uri().resolve(targetUrl);
     var request = await httpClient.getUrl(uri);
     var response = await request.close();
-    var responseBody = await response.transform(UTF8.decoder).join();
+    var responseBody = await response.transform(new Utf8Decoder()).join();
     print("response: " + responseBody);
     var document = xml.parse(responseBody);
     print("response document: " + document.toString());
@@ -40,7 +39,7 @@ class GetS3Object {
     var uri = new Uri().resolve(target);
     var request = await httpClient.getUrl(uri);
     var response = await request.close();
-    var responseBody = await response.transform(UTF8.decoder).join();
+    var responseBody = await response.transform(new Utf8Decoder()).join();
     // print("gso response: " + responseBody);
 
     return responseBody;
@@ -58,6 +57,10 @@ class GetS3Object {
     */
   }
 
+  Future<File> tmpFile() async {
+    var ms=new DateTime.now().millisecondsSinceEpoch.toString();
+    return _localFile(fileName: "dataLog_${ms}.ndjson");
+  }
   Future<File> ndJsonFile() async {
     return _localFile(fileName: "dataLog.ndjson");
   }
@@ -90,9 +93,13 @@ class GetS3Object {
     if (resumeFrom == 0) {
       print("Resume Download delegating ${mainFileName.path}");
 
-      return getS3ObjectAsFile(target, mainFileName);
+      await getS3ObjectAsFile(target, mainFileName);
+      await RefreshData.parseAndLoadFile(mainFileName);
+
+      return mainFileName;
     }
     //var sink1 = fName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
+    print("Resume Download from offset ${resumeFrom}");
 
     HttpClientResponse response = await new HttpClient()
         .getUrl(Uri.parse(target))
@@ -109,10 +116,17 @@ class GetS3Object {
     }
 
     if (response.statusCode == 206) {
+      var myTmpFile=await tmpFile();
       print("_resumeS3ObjectAsFile: resuming with partial download");
 
-      var sinkDelta = mainFileName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
+      //IOSink sinkDelta = mainFileName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
+      IOSink sinkDelta = myTmpFile.openWrite();
       await response.pipe(sinkDelta);
+
+
+      await RefreshData.parseAndLoadFile(myTmpFile);
+      await concatenate(appendee: mainFileName, appendage:myTmpFile);
+      await myTmpFile.delete();
     }
     await getFileLength(mainFileName, "_resume Done");
 
@@ -122,6 +136,15 @@ class GetS3Object {
     return mainFileName;
   }
 
+  Future concatenate({File appendee,File appendage})async {
+    IOSink sinkDelta = appendee.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
+    Stream<List<int>> inputStream = appendage.openRead();
+
+    await inputStream.pipe(sinkDelta);
+
+
+
+  }
   void foo1(String target) async {
     await new HttpClient()
         .getUrl(Uri.parse(target))
@@ -173,18 +196,6 @@ class GetS3Object {
     }
     */
     return fname;
-    //var rbd= JSON.decode(getRbdJson());
-
-    /*
-    print("Downloading object: ${target}");
-    var httpClient = new HttpClient();
-    var uri = new Uri().resolve(target);
-    var request = await httpClient.getUrl(uri);
-    var response = await request.close();
-    var responseBody = await response.join();
-
-    return responseBody;
-    */
   }
 
   void reportElapsed(List<int> times, String literal) {
@@ -208,15 +219,9 @@ class GetS3Object {
   }
 }
 
-//class RefreshData<T extends HasJsonMap>{
-//Future<List<T>> doRefresh(RaceConfig raceConfig,String serializedName) async {
-
-typedef bool RefreshFilter(RaceStanding reHydrated);
-
 class RefreshData {
-  RefreshFilter refreshFilter;
-  RefreshData({this.refreshFilter});
-  Future<Map<int, T>> doRefresh<T>({RaceConfig raceConfig}) async {
+  RefreshData();
+  Future doRefresh<T>({RaceConfig raceConfig}) async {
     GetS3Object gs30 = new GetS3Object();
     if (raceConfig == null) {
       raceConfig = globals.globalDerby.raceConfig;
@@ -236,59 +241,36 @@ class RefreshData {
 
     print("doRefresh begin. ");
     print(" ndjson: ${ndjson}");
+    //await parseAndLoadFile(ndjson);  // TODO: DO NOT PARSE/LOAD ENTIRE FILE ON REFRESH!
 
+    ptime.add(DateTime.now().millisecondsSinceEpoch);
+
+    return ;
+  }
+  static Future parseAndLoadFile(File ndjson)async {
     Stream<List<int>> inputStream = ndjson.openRead();
     int accumulatedBytes = 0;
-
-    /*
-    bool stringFilter(String event) {
-      var q = "\"";
-      var pattern = new RegExp("${q}sn${q}:${q}${serializedName}${q}");
-      return event.contains(pattern);
-    }
-    */
 
     Stream<String> lineStream = await inputStream
         .transform(new Utf8Decoder())
         .transform(new LineSplitter());
     await republishStream(lineStream);
-    //.where(stringFilter)
-    //.toList();
-    ;
-    ptime.add(DateTime.now().millisecondsSinceEpoch);
-    SplayTreeMap<int, T> rcMap = new SplayTreeMap();
 
-    return rcMap;
   }
 
-  Future<int> republishStream(Stream<String> stream) async {
-    var sum = 0;
+  static Future<int> republishStream(Stream<String> stream) async {
     try {
       await for (var line in stream) {
         print("republishStream: $line");
-        ModelFactory.loadDb(line);
+        await ModelFactory.loadDb(line);
       }
     } catch (e) {
       return -1;
     }
-    return sum;
+    return 0;
   }
 
-  void load(StreamController<Racer> sc) async {
-    String url = "";
-    var client = new HttpClient();
-    var uri = new Uri().resolve(url);
-    var request = await client.getUrl(uri);
-    //request.
-    var streamedResponse = await request.close();
-    streamedResponse
-        .transform(new Utf8Decoder())
-        .transform(json.decoder)
-        .expand((e) => e)
-        .map((map) => Racer.fromJson(map))
-        .pipe(sc);
-    ;
-  }
+
 }
 
 class RaceConfig {
@@ -300,8 +282,7 @@ class RaceConfig {
       : raceName = json["raceName"],
         applicationUrl = json["applicationUrl"],
         s3BucketUrlPrefix = json["s3BucketUrlPrefix"];
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'raceName': raceName,
         'applicationUrl': applicationUrl,
         's3BucketUrlPrefix': s3BucketUrlPrefix,

@@ -35,27 +35,13 @@ class RaceResultWidget extends StatelessWidget {
     return new Card(child: tableWidget, color: bgColor);
   }
 
-  static Widget _getLakeWidget() {
-    print("getLakeWidget");
-    return new Image.network(
-        'https://github.com/flutter/website/blob/master/_includes/code/layout/lakes/images/lake.jpg?raw=true',
-        height: 50.0,
-        width: 50.0);
-  }
 
-  static Widget _getCachedLakeWidget() {
-    return new CachedNetworkImage(
-      placeholder: new CircularProgressIndicator(),
-      imageUrl:
-          'https://github.com/flutter/website/blob/master/_includes/code/layout/lakes/images/lake.jpg?raw=true',
-    );
-  }
+
+
 
   static Widget getFinishFlagWidget() {
     if (true) {
       return _getFixedFFWidget();
-      return _getCachedLakeWidget();
-      return _getLakeWidget();
     }
     return new DecoratedBox(
         decoration: new BoxDecoration(
@@ -90,9 +76,18 @@ class RaceResultWidget extends StatelessWidget {
     var resultsSummary = new ResultsSummary();
     displayableRace.getResultsSummary(resultsSummary);
 
+
+    // race level messages (as opposed to driver level)
+    for(String raceMessage in resultsSummary.getMessages(null)){
+      rc.add(new TableRow(children: <Widget>[
+        new Text(""),
+        new Text("$raceMessage"),
+
+      ]));
+    }
     for (var carNumber in displayableRace.getCarNumbers()) {
       if(carNumber==null){
-        continue;
+        //continue;
       }
       var driverName = driverMap[carNumber]?.racerName;
 

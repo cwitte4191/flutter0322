@@ -35,7 +35,6 @@ class DerbyNavDrawer {
       drawerItems.add(new ListTile(
         title: new Text('Racers'),
         onTap: () async {
-          // Map<int, Racer> racerMap = await new RefreshData().doRefresh("Racer");
 
           Navigator.push(context,
               new MaterialPageRoute(builder: (context) => new RacerHome()));

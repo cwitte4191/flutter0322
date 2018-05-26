@@ -59,18 +59,18 @@ class RaceStanding implements HasRelational, HasCarNumbers{
         raceBracketName: bracketName);
   }
 
+
+  //
   static bool isPending(RaceStanding rs) {
-    return rs.phase2DeltaMS == null;
+    return rs.phase2DeltaMS == null || rs.phase2DeltaMS==null;;
   }
 
-  static bool isNotPending(RaceStanding rs) {
-    return !isPending(rs);
-  }
+
 
 
 
   static String selectSql =
-      "select * from RaceStanding where isDeleted=0 and isPending=0 order by lastUpdateMS desc";
+      "select * from RaceStanding where isDeleted=0 order by lastUpdateMS desc";
   static String selectPendingSql =
       "select * from RaceStanding where isDeleted=0 and isPending > 0 order by lastUpdateMS desc";
   static const String insertSql =
