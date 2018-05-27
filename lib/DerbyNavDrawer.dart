@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter0322/appPages/BracketList.dart';
 import 'package:flutter0322/appPages/RaceSelection2.dart';
-import 'package:flutter0322/appPages/RacerPage.dart';
-import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
 class DerbyNavDrawer {
+  static popNavMenu(BuildContext context){
+    Navigator.of(context).canPop() && Navigator.of(context).pop();
+
+  }
   static Drawer getDrawer(BuildContext context) {
     String title = "Derby Menu";
     bool hasConfig = globals.globalDerby.raceConfig != null;
@@ -26,27 +27,29 @@ class DerbyNavDrawer {
       drawerItems.add(new ListTile(
         title: new Text('Races'),
         onTap: () async {
-          Navigator.push(
-              context,
-              new MaterialPageRoute(
-                  builder: (context) => new TabbedRaceHistory()));
+
+          popNavMenu(context);
+          Navigator.of(context).pushReplacementNamed('/RacesTab');
+
+
         },
       ));
       drawerItems.add(new ListTile(
         title: new Text('Racers'),
         onTap: () async {
+          popNavMenu(context);
 
-          Navigator.push(context,
-              new MaterialPageRoute(builder: (context) => new RacerHome()));
+          Navigator.of(context).pushReplacementNamed('/Racers');
+
         },
       ));
 
       drawerItems.add(new ListTile(
         title: new Text('Brackets'),
         onTap: () async {
+          popNavMenu(context);
 
-            Navigator.push(context,
-                new MaterialPageRoute(builder: (context) => new BracketList()));
+          Navigator.of(context).pushReplacementNamed('/Brackets');
 
         }
       ));
