@@ -71,4 +71,10 @@ class RaceStandingPageState extends State<RaceStandingPage>
     });
     return this.mounted;
   }
+
+  @override
+  bool isWidgetMounted() {
+    return this.mounted;
+  }
+
 }

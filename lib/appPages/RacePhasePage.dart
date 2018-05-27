@@ -66,4 +66,9 @@ class RacePhasePageState extends State<RacePhasePage> implements DbRefreshAid {
     return this.mounted;
 
   }
+
+  @override
+  bool isWidgetMounted() {
+    return this.mounted;
+  }
 }

@@ -87,4 +87,8 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
     });
     return this.mounted;
   }
+  @override
+  bool isWidgetMounted() {
+    return this.mounted;
+  }
 }
