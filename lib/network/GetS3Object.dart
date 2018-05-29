@@ -298,6 +298,19 @@ class RaceConfig {
         raceName: raceName);
   }
 
+  String getMqttHostname(){
+    String rc=applicationUrl;
+    print("getMqttHostname: $rc");
+    //TODO: build uri/url and get hostname.  did not find a relevant constructor :-(
+    rc=rc.replaceAll("http://", "");
+    rc=rc.replaceAll("root@", "");
+    Pattern p=new RegExp(":");
+    List<String>rcSplit=rc.split(new RegExp(":"));
+    rc=rcSplit[0];
+    print("getMqttHostname: gave: $rc");
+
+    return rc;
+  }
   Future persistToFile() async {
     File rcFile = await new GetS3Object().raceConfigFile();
     var json = new JsonCodec();

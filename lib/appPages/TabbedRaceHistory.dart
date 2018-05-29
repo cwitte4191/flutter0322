@@ -77,8 +77,8 @@ class _TabbedRaceHistoryState extends State<TabbedRaceHistory> with SingleTicker
       floatingActionButton: new FloatingActionButton(
         onPressed: ()=>          requestRefresh(context)
         ,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
+        tooltip: 'Refresh',
+        child: new Icon(Icons.refresh),
       ), // This tr
     );
 

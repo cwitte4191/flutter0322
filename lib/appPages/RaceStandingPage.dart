@@ -19,6 +19,7 @@ class RaceStandingPage extends StatefulWidget {
 class RaceStandingPageState extends State<RaceStandingPage>
     implements DbRefreshAid {
   final HistoryType historyType;
+  bool firstTime=true;
 
   RaceStandingPageState({this.historyType}) {
     DbRefreshAid.dbAidWatchForNextChange(this, "RaceStanding");
@@ -35,9 +36,11 @@ class RaceStandingPageState extends State<RaceStandingPage>
   }
 
   Widget getRaceStandingHistoryBodyFromDB() {
-    // TODO: we seem to be recurse  ing w/o this!?
-    if (raceStandingList?.length == 0) {
+
+    if(firstTime){
+      // TODO: we seem to be recurse ing w/o this!?
       queryDataFromDb();
+      firstTime=false; // don't initiate query on subsequent build events.
     }
 
     return ListView.builder(

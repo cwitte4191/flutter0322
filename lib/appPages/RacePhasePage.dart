@@ -15,6 +15,7 @@ class RacePhasePage extends StatefulWidget {
 class RacePhasePageState extends State<RacePhasePage> implements DbRefreshAid {
   String title;
   List<Map<String, dynamic>> racePhaseList = [];
+  bool firstTime=true;
 
   RacePhasePageState() {
     DbRefreshAid.dbAidWatchForNextChange(this, "RacePhase");
@@ -32,9 +33,11 @@ class RacePhasePageState extends State<RacePhasePage> implements DbRefreshAid {
   Widget getRacePhaseHistoryBodyFromDB() {
 
 
-    if (racePhaseList?.length == 0) {
-      // TODO: we seem to be recursing w/o this!?
+
+    if(firstTime){
+      // TODO: we seem to be recurse ing w/o this!?
       queryDataFromDb();
+      firstTime=false; // don't initiate query on subsequent build events.
     }
 
     return ListView.builder(

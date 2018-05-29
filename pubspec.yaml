@@ -11,7 +11,7 @@ dependencies:
   #wilt: any
   tuple: "^1.0.1"
   color: "^2.0.2"
-  #mqtt_client: "^1.7.1"
+  #mqtt_client: "^1.7.2"
   mqtt_client: 
       path: /Users/cwitte/scratch/mqtt_client
   archive: "^1.0.33"
@@ -19,6 +19,7 @@ dependencies:
   #protobuf: ">=0.3.4 <0.4.0"
   #dson: "any"
   intl: "^0.15.6"
+  event_bus: "^0.4.1"
 
   semaphore: "^0.0.1"
   sqflite: "^0.8.9"

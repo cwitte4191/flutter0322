@@ -7,13 +7,14 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:tuple/tuple.dart';
+import 'package:event_bus/event_bus.dart' as events;
 
 class DerbyDb {
   String dbPath;
   Database database;
   StreamController<HasRelational> fromNetworkController;
   StreamController<String> recentChangesController;
-
+  events.EventBus clientEventBus;
 
   Future init({bool doReset}) async {
     createFromNetworkStream();
@@ -33,15 +34,26 @@ class DerbyDb {
   void createFromNetworkStream() {
     fromNetworkController = StreamController.broadcast<HasRelational>();
 
-
-
     fromNetworkController.stream.forEach((model) =>  addNewModel(model));
   }
 
   void createRecentChangesStream() {
     recentChangesController = StreamController.broadcast<String>();
+    /*
+    clientEventBus= new events.EventBus();
+    clientEventBus.on(RacePhase).listen(( String event)=> print("Event bus handler2: gotRacePhase:  ${event}") );
 
+    clientEventBus.fire("foo");
+    clientEventBus.fire(new RacePhase());
+    */
   }
+
+  /*
+  void gotRacePhase(Object event) {
+
+    print("Event bus handler: gotRacePhase:  $event");
+  }
+  */
 
   void testBroadcastSink(){
     final String tbs="testBroadcastSink";
@@ -50,7 +62,6 @@ class DerbyDb {
     recentChangesController.stream.listen((istring)=>print("$tbs recentChangesSubscriber2: got $istring"));
 
     int now=new DateTime.now().millisecondsSinceEpoch;
-    Sink<String>ss=recentChangesController.sink;
     recentChangesController.add("$tbs testBroadcast now:  $now" );
 
     countStream(5).pipe(recentChangesController);
@@ -71,7 +82,7 @@ class DerbyDb {
 
     await  openDb();
 
-    ;
+
     print("deleteAndDefine: inserting");
 
     // Insert some records in a transaction
@@ -122,6 +133,8 @@ class DerbyDb {
       print("deleteAndDefine: create complete.");
     });
   }
+
+
 }
 class RecentWatch{
   Duration recentDuration = new Duration(seconds:1);

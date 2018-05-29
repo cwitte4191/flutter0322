@@ -18,6 +18,7 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
   final String title;
   List<Map<String, dynamic>> racerDbMap = [];
 
+  bool firstTime=true;
   BuildContext lastContext;
   RacerHomeState({this.title = "Racers"}) {
     DbRefreshAid.dbAidWatchForNextChange(this, "Racer");
@@ -36,8 +37,8 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
       body: getRacerListBodyFromDB(),
       floatingActionButton: new FloatingActionButton(
         onPressed: () => requestRefresh(context),
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
+        tooltip: 'Refresh',
+        child: new Icon(Icons.refresh),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -63,9 +64,11 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
   }
 
   Widget getRacerListBodyFromDB() {
-    if (racerDbMap?.length == 0) {
+    //if (racerDbMap?.length == 0) {
+    if(firstTime){
       // TODO: we seem to be recurse ing w/o this!?
       queryDataFromDb();
+      firstTime=false; // don't initiate query on subsequent build events.
     }
 
     return ListView.builder(

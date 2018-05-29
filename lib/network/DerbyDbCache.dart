@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/derbyDb.dart';
 
@@ -9,7 +11,7 @@ class DerbyDbCache<T extends HasRelational>{
   DerbyDb derbyDb;
   DerbyDbCache(this.modelString);
 
-  void init(DerbyDb ddb) async {
+  Future init(DerbyDb ddb) async {
     this.derbyDb=ddb;
     ddb.recentChangesController.stream.listen(onChangeHandler);
 
