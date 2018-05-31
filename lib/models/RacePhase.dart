@@ -137,7 +137,7 @@ class RacePhase
   }
 
   static String selectSql =
-      "select * from RacePhase where isDeleted=0 order by id desc";
+      "select * from RacePhase where  isDeleted=0 {carFilter} order by id desc";
   static const String insertSql =
       "REPLACE INTO RacePhase(id, raceStandingID, phaseNumber,  "
       "  carNumber1, carNumber2,  resultMS,    "
@@ -168,8 +168,26 @@ class RacePhase
     return createSql;
   }
 
-  static String getSelectSql() {
-    return selectSql;
+  static String transformFiltertoSql(String carFilter){
+    if(carFilter==null || carFilter==""){
+      return "";
+    }
+    final RegExp re=new RegExp("^${carFilter}\$");
+    if(re.hasMatch(carFilter)){
+      if(carFilter.length==1){
+        carFilter="\"$carFilter%\"";
+      }
+      else{
+        carFilter="\"$carFilter\"";
+      }
+      return (" and (cast(carNumber1 as text) like $carFilter or cast(carNumber2 as text) like $carFilter ) ");
+    }
+
+    return "";
+  }
+  static String getSelectSql({String carFilter}) {
+    String sqlFilter=transformFiltertoSql(carFilter);
+    return selectSql.replaceAll("{carFilter}", sqlFilter);
   }
 }
 

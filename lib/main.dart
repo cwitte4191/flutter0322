@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:flutter0322/testData.dart';
 import 'package:flutter0322/globals.dart' as globals;
 import 'package:flutter0322/widgets/RaceSelectionWidget.dart';
+import 'package:flutter0322/widgets/TextDialogDemo.dart';
 
 //import 'mqtt.dart';
 //import 'package:pubsub/pubsub.dart';
@@ -18,7 +19,11 @@ import 'package:flutter0322/widgets/RaceSelectionWidget.dart';
 void main() async {
   //new GetS3Object().writeCounter(77);
   //new GetS3Object().getS3ObjectAsFile("foo");
+ if (false) {
+   runApp(new MaterialApp(home: new FocusVisibilityDemo()));
 
+   return;
+ }
   //new MqttTest().mains();
   /*
   const oneSec = const Duration(seconds:5);

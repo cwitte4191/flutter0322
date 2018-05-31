@@ -70,9 +70,9 @@ class RaceStanding implements HasRelational, HasCarNumbers{
 
 
   static String selectSql =
-      "select * from RaceStanding where isDeleted=0 order by lastUpdateMS desc";
+      "select * from RaceStanding where isDeleted=0 {carFilter} order by lastUpdateMS desc";
   static String selectPendingSql =
-      "select * from RaceStanding where isDeleted=0 and isPending > 0 order by lastUpdateMS desc";
+      "select * from RaceStanding where isDeleted=0 and isPending > 0  {carFilter} order by lastUpdateMS desc";
   static const String insertSql =
       "REPLACE INTO RaceStanding(id, chartPosition, raceBracketID, carNumber1, carNumber2,  phase1DeltaMS, phase2DeltaMS, lastUpdateMS, isPending, isDeleted) VALUES(?,?,?, ?,?,?, ?,?,?, ?)";
   static const String createSql =
@@ -98,7 +98,11 @@ class RaceStanding implements HasRelational, HasCarNumbers{
     return createSql;
   }
 
-  static String getSelectSql(bool getPending) {
-    return getPending ? selectPendingSql : selectSql;
+  static String getSelectSql({String carFilter,bool getPending}) {
+    String sqlFilter=RacePhase.transformFiltertoSql(carFilter);
+    String pendgingSql= getPending ? selectPendingSql : selectSql;
+
+    return pendgingSql.replaceAll("{carFilter}", sqlFilter);
   }
+
 }

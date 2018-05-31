@@ -4,6 +4,7 @@ import 'package:flutter0322/appPages/RacePhasePage.dart';
 import 'package:flutter0322/appPages/RaceStandingPage.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
+import 'package:flutter0322/globals.dart' as globals;
 
 enum HistoryType{ Phase, Standing, Pending}
 class TabbedRaceHistory extends StatefulWidget{
@@ -86,7 +87,8 @@ class _TabbedRaceHistoryState extends State<TabbedRaceHistory> with SingleTicker
 
   }
   void requestRefresh(BuildContext context) async{
-    await new RefreshData().doRefresh();
+    await globals.globalDerby.refreshStatus.doRefresh();
+
 /*
     Navigator.push(
         context,

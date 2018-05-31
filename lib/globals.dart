@@ -6,7 +6,9 @@ import 'dart:io';
 import 'package:flutter0322/MqttOberver.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/DerbyDbCache.dart';
+//import 'package:flutter0322/network/FbaseDerby.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
+import 'package:flutter0322/network/RefreshStatus.dart';
 import 'package:flutter0322/network/derbyDb.dart';
 
 class GlobalDerby {
@@ -15,6 +17,7 @@ class GlobalDerby {
   //Map<int, Racer> racerMap=new Map();
   //Map<int, RaceBracket> bracketMap=new Map();
 
+  //final FbaseDerby fbaseDerby=new FbaseDerby();
   final DerbyDb derbyDb = new DerbyDb();
   final DerbyDbCache racerCache = new DerbyDbCache<Racer>("Racer");
   final DerbyDbCache raceBracketCache =
@@ -22,6 +25,9 @@ class GlobalDerby {
   File ndJsonPath;
   int ndJsonRefreshInProgress;
   MqttObserver mqttObserver;
+  RefreshStatus refreshStatus=new RefreshStatus();
+
+  String sqlCarNumberFilter="";
 
   Map<int, Racer> getRacerCache() {
     return Map.castFrom(racerCache.cacheMap);
@@ -53,6 +59,7 @@ class GlobalDerby {
     await racerCache.init(derbyDb);
     await raceBracketCache.init(derbyDb);
     //mqttObserver.init();
+    //fbaseDerby.init();
   }
 }
 

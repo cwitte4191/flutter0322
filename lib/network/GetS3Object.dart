@@ -245,6 +245,7 @@ class RefreshData {
 
     ptime.add(DateTime.now().millisecondsSinceEpoch);
 
+    reportElapsed(ptime);
     return ;
   }
   static Future parseAndLoadFile(File ndjson)async {
@@ -268,6 +269,21 @@ class RefreshData {
       return -1;
     }
     return 0;
+  }
+
+  void reportElapsed(List<int> ptime) {
+    int prev;
+    int x=0;
+    for(int thisTime in ptime){
+      if(prev!=null){
+        int delta=thisTime- prev;
+        print("elapsedDelta $x: ${delta}");
+      }
+
+      prev=thisTime;
+      x++;
+    }
+
   }
 
 

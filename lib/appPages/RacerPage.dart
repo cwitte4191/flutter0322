@@ -5,6 +5,7 @@ import 'package:flutter0322/appPages/DbRefreshAid.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
 import 'package:flutter0322/globals.dart' as globals;
+import 'package:flutter0322/widgets/FormDemo.dart';
 import 'package:flutter0322/widgets/RacerWidget.dart';
 
 class RacerHome extends StatefulWidget {
@@ -18,7 +19,7 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
   final String title;
   List<Map<String, dynamic>> racerDbMap = [];
 
-  bool firstTime=true;
+  bool firstTime = true;
   BuildContext lastContext;
   RacerHomeState({this.title = "Racers"}) {
     DbRefreshAid.dbAidWatchForNextChange(this, "Racer");
@@ -34,7 +35,8 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
         title: new Text(title),
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
-      body: getRacerListBodyFromDB(),
+      body: //new TextFormFieldDemo(),
+         getRacerListBodyFromDB(),
       floatingActionButton: new FloatingActionButton(
         onPressed: () => requestRefresh(context),
         tooltip: 'Refresh',
@@ -45,7 +47,7 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
 
   void requestRefresh(BuildContext context) async {
     print("requestRefresh!");
-    await new RefreshData().doRefresh();
+    await globals.globalDerby.refreshStatus.doRefresh();
     //Navigator.push(context,
     //  new MaterialPageRoute(builder: (context) => new RacerHome()));
   }
@@ -65,10 +67,10 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
 
   Widget getRacerListBodyFromDB() {
     //if (racerDbMap?.length == 0) {
-    if(firstTime){
+    if (firstTime) {
       // TODO: we seem to be recurse ing w/o this!?
       queryDataFromDb();
-      firstTime=false; // don't initiate query on subsequent build events.
+      firstTime = false; // don't initiate query on subsequent build events.
     }
 
     return ListView.builder(
@@ -90,6 +92,7 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
     });
     return this.mounted;
   }
+
   @override
   bool isWidgetMounted() {
     return this.mounted;

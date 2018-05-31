@@ -73,9 +73,9 @@ class RaceSelectionWidget extends StatelessWidget {
 
       await globals.globalDerby.init(true);
 
-      Map<int, Racer> racerMap =
-          await new RefreshData().doRefresh(raceConfig: raceConfig);
-      //globals.globalDerby.derbyDb.testBroadcastSink();
+
+      await globals.globalDerby.refreshStatus.doRefresh();
+
 
       raceConfig.persistToFile();
       Navigator.push(context,

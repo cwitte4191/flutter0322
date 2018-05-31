@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter0322/appPages/DbRefreshAid.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
+import 'package:flutter0322/widgets/FilterRowWidget.dart';
 import 'package:flutter0322/widgets/RaceResultWidget.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
@@ -40,12 +41,21 @@ class RacePhasePageState extends State<RacePhasePage> implements DbRefreshAid {
       firstTime=false; // don't initiate query on subsequent build events.
     }
 
+    int listSize=racePhaseList?.length;
+    listSize+=1;  // artificially larger for filter.
+
     return ListView.builder(
-        itemBuilder: racePhaseItemBuilder, itemCount: racePhaseList?.length);
+        itemBuilder: racePhaseItemBuilder, itemCount: listSize);
   }
 
   Widget racePhaseItemBuilder(BuildContext context, int index) {
 
+    if(index==0){
+      return new FilterRowWidget(triggerTable: RacePhase);
+    }
+    else{
+      index=index-1;
+    }
     RacePhase racePhase = new RacePhase.fromSqlMap(racePhaseList[index]);
 
     RacePhaseUi racePhaseUi = new RacePhaseUi(racePhase);
@@ -56,7 +66,7 @@ class RacePhasePageState extends State<RacePhasePage> implements DbRefreshAid {
   @override
   bool queryDataFromDb() {
     globals.globalDerby.derbyDb?.database
-        ?.rawQuery(RacePhase.getSelectSql())
+        ?.rawQuery(RacePhase.getSelectSql(carFilter:globals.globalDerby.sqlCarNumberFilter))
         ?.then((list) {
       print("RacePhase: repopulateList! $list");
 

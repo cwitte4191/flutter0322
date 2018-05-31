@@ -3,6 +3,7 @@ import 'package:flutter0322/appPages/DbRefreshAid.dart';
 import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
+import 'package:flutter0322/widgets/FilterRowWidget.dart';
 import 'package:flutter0322/widgets/RaceResultWidget.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
@@ -19,7 +20,7 @@ class RaceStandingPage extends StatefulWidget {
 class RaceStandingPageState extends State<RaceStandingPage>
     implements DbRefreshAid {
   final HistoryType historyType;
-  bool firstTime=true;
+  bool firstTime = true;
 
   RaceStandingPageState({this.historyType}) {
     DbRefreshAid.dbAidWatchForNextChange(this, "RaceStanding");
@@ -36,19 +37,27 @@ class RaceStandingPageState extends State<RaceStandingPage>
   }
 
   Widget getRaceStandingHistoryBodyFromDB() {
-
-    if(firstTime){
+    if (firstTime) {
       // TODO: we seem to be recurse ing w/o this!?
       queryDataFromDb();
-      firstTime=false; // don't initiate query on subsequent build events.
+      firstTime = false; // don't initiate query on subsequent build events.
     }
 
+    int listSize=raceStandingList?.length;
+    listSize+=1;  // artificially larger for filter.
     return ListView.builder(
         itemBuilder: raceStandingItemBuilder,
-        itemCount: raceStandingList?.length);
+        itemCount: listSize);
   }
 
   Widget raceStandingItemBuilder(BuildContext context, int index) {
+    if(index==0){
+      return new FilterRowWidget(triggerTable: RaceStanding);
+    }
+    else{
+      index=index-1;
+    }
+
     RaceStanding raceStanding =
         new RaceStanding.fromSqlMap(raceStandingList[index]);
 
@@ -62,11 +71,13 @@ class RaceStandingPageState extends State<RaceStandingPage>
   bool queryDataFromDb() {
     bool getPending = (historyType == HistoryType.Pending);
     globals.globalDerby.derbyDb?.database
-        ?.rawQuery(RaceStanding.getSelectSql(getPending))
+        ?.rawQuery(RaceStanding.getSelectSql(
+            getPending: getPending,
+            carFilter: globals.globalDerby.sqlCarNumberFilter))
         ?.then((list) {
       print("RaceStanding: repopulateList! $list");
 
-      if(this.mounted) {
+      if (this.mounted) {
         setState(() {
           raceStandingList = list;
         });
@@ -79,5 +90,4 @@ class RaceStandingPageState extends State<RaceStandingPage>
   bool isWidgetMounted() {
     return this.mounted;
   }
-
 }
