@@ -27,21 +27,15 @@ class FilterRowWidgetState extends State<FilterRowWidget> {
 
 
     return new Row(children: <Widget>[
-      new Icon(Icons.filter_list,size:64.0),
+      new Icon(Icons.filter_list,size:48.0),
       new Container(
         width:175.0,
       child:new TextField(
         autofocus: false,
         maxLength: 3,
         controller: _controller,
-        onSubmitted: ((String foo) {
-          print("filtering car number: $foo");
-          print("filtering trigger: "+triggerTable.runtimeType.toString());
-          globals.globalDerby.sqlCarNumberFilter=foo.toString();
-          globals.globalDerby.derbyDb.recentChangesController.add(triggerTable.toString());
-
-        }
-        ),
+        onSubmitted: applyCarFilter,
+        onChanged: applyCarFilter,
         keyboardType:TextInputType.number,
 
         decoration: new InputDecoration(
@@ -49,5 +43,9 @@ class FilterRowWidgetState extends State<FilterRowWidget> {
 
       )),
     ],);
+  }
+  void applyCarFilter(String foo) {
+    globals.globalDerby.sqlCarNumberFilter=foo.toString();
+    globals.globalDerby.derbyDb.recentChangesController.add(triggerTable.toString());
   }
 }
