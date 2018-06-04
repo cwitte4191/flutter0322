@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter0322/DerbyNavDrawer.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/widgets/RaceResultWidget.dart';
+import 'package:flutter0322/globals.dart' as globals;
 
 
 class TabbedBracket extends StatelessWidget {
@@ -55,8 +56,10 @@ class TabbedBracket extends StatelessWidget {
 
       if (rrw != null) rpList.add(rrw);
     }
-    return new ListView(
+    return RefreshIndicator(
+      onRefresh: globals.globalDerby.refreshStatus.doRefresh,
+    child: new ListView(
       children: rpList,
-    );
+    ));
   }
 }

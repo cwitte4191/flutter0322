@@ -11,7 +11,7 @@ class RefreshStatus{
   {
 
   }
-  Future doRefresh({RaceConfig raceConfig})async{
+  Future<Null> doRefresh({RaceConfig raceConfig})async{
     print("doRefresh0");
     int t0=DateTime.now().millisecondsSinceEpoch;
 
@@ -29,6 +29,7 @@ class RefreshStatus{
 
     print("doRefresh2: $waitTime2");
 
+    return;
   }
   bool isRefreshInProgress(){
     return( running>0);

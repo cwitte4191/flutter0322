@@ -35,18 +35,17 @@ class DerbyBodyWidgets {
       ));
     }
 
-    Map<int, RaceBracket> bracketMap=globals.globalDerby.getRaceBrakcetCache();
+    Map<int, RaceBracket> bracketMap =
+        globals.globalDerby.getRaceBrakcetCache();
     print("getBracketListBody2: ${bracketMap.length}");
     bracketMap.forEach(add1Bracket);
 
-    return new ListView(
-      children: bracketWidgetList,
-    );
+    return RefreshIndicator(
+        onRefresh: globals.globalDerby.refreshStatus.doRefresh,
+        child: new ListView(
+          children: bracketWidgetList,
+        ));
   }
-
-
-
-
 
   Widget getRaceStandingHistoryBody(Map<int, RaceStanding> standingMap) {
     print("getRaceStandingHistoryBody: begin");
@@ -56,26 +55,25 @@ class DerbyBodyWidgets {
     void add1Widget(int key, RaceStanding raceStanding) {
       //RaceStandingUi raceStandingUi = new RaceStandingUi(raceStanding);
       raceStandingList.add(raceStanding);
-
     }
 
     standingMap.forEach(add1Widget);
-    raceStandingList.sort((a, b) =>
-        -1 *
-        a.lastUpdateMS.compareTo(b.lastUpdateMS));
-
-
+    raceStandingList
+        .sort((a, b) => -1 * a.lastUpdateMS.compareTo(b.lastUpdateMS));
 
     Widget raceStandingItemBuilder(BuildContext context, int index) {
       print("raceStandingItemBuilder $index");
-      RaceStandingUi raceStandingUi = new RaceStandingUi(raceStandingList[index]);
+      RaceStandingUi raceStandingUi =
+          new RaceStandingUi(raceStandingList[index]);
       RaceResultWidget rrw = new RaceResultWidget(
-          displayableRace: raceStandingUi,
-          );
+        displayableRace: raceStandingUi,
+      );
       return rrw;
     }
+
     return ListView.builder(
-        itemBuilder: raceStandingItemBuilder, itemCount: raceStandingList.length);
+        itemBuilder: raceStandingItemBuilder,
+        itemCount: raceStandingList.length);
   }
 
   Widget getTestDataRaceHistoryBody() {
@@ -107,21 +105,21 @@ class DerbyBodyWidgets {
     racePhaseT2.phaseNumber = 2;
 
     var driverMap = new Map<int, Racer>();
-    driverMap[101] = new Racer(racerName:"Bugs");
-    driverMap[201] = new Racer(racerName:"Bunny");
-    driverMap[202] = new Racer(racerName : "Elmer");
-    driverMap[102] = new Racer(racerName : "Fudd");
+    driverMap[101] = new Racer(racerName: "Bugs");
+    driverMap[201] = new Racer(racerName: "Bunny");
+    driverMap[202] = new Racer(racerName: "Elmer");
+    driverMap[102] = new Racer(racerName: "Fudd");
 
     var rpList = new List<Widget>();
     for (int x = 0; x < 50; x++) {
       var rrw = null;
       if (x % 3 == 0) {
-        rrw = new RaceResultWidget(
-            displayableRace: new RacePhaseUi(racePhaseT1));
+        rrw =
+            new RaceResultWidget(displayableRace: new RacePhaseUi(racePhaseT1));
       }
       if (x % 3 == 1) {
-        rrw = new RaceResultWidget(
-            displayableRace: new RacePhaseUi(racePhaseT2));
+        rrw =
+            new RaceResultWidget(displayableRace: new RacePhaseUi(racePhaseT2));
       }
       if (x % 3 == 2) {
         rrw = new RaceResultWidget(

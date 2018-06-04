@@ -43,19 +43,20 @@ class RaceStandingPageState extends State<RaceStandingPage>
       firstTime = false; // don't initiate query on subsequent build events.
     }
 
-    int listSize=raceStandingList?.length;
-    listSize+=1;  // artificially larger for filter.
-    return ListView.builder(
-        itemBuilder: raceStandingItemBuilder,
-        itemCount: listSize);
+    int listSize = raceStandingList?.length;
+    listSize += 1; // artificially larger for filter.
+
+    return RefreshIndicator(
+        onRefresh: globals.globalDerby.refreshStatus.doRefresh,
+        child: ListView.builder(
+            itemBuilder: raceStandingItemBuilder, itemCount: listSize));
   }
 
   Widget raceStandingItemBuilder(BuildContext context, int index) {
-    if(index==0){
+    if (index == 0) {
       return new FilterRowWidget(triggerTable: RaceStanding);
-    }
-    else{
-      index=index-1;
+    } else {
+      index = index - 1;
     }
 
     RaceStanding raceStanding =

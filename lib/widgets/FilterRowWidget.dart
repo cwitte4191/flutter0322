@@ -19,33 +19,38 @@ class FilterRowWidgetState extends State<FilterRowWidget> {
   void initState() {
     super.initState();
 
-    _controller = new TextEditingController(text: globals.globalDerby.sqlCarNumberFilter);
+    _controller =
+        new TextEditingController(text: globals.globalDerby.sqlCarNumberFilter);
   }
+
   @override
   Widget build(BuildContext context) {
-    String filter=globals.globalDerby.sqlCarNumberFilter;
+    String filter = globals.globalDerby.sqlCarNumberFilter;
 
-
-    return new Row(children: <Widget>[
-      new Icon(Icons.filter_list,size:48.0),
-      new Container(
-        width:175.0,
-      child:new TextField(
-        autofocus: false,
-        maxLength: 3,
-        controller: _controller,
-        onSubmitted: applyCarFilter,
-        onChanged: applyCarFilter,
-        keyboardType:TextInputType.number,
-
-        decoration: new InputDecoration(
-            labelText: 'CarNumber', hintText: 'eg. 000'),
-
-      )),
-    ],);
+    return new Row(
+      children: <Widget>[
+        new Icon(Icons.filter_list, size: 48.0),
+        new Container(width: 30.0),
+        new Container(
+            width: 75.0,
+            child: new TextField(
+              autofocus: false,
+              maxLength: 3,
+              controller: _controller,
+              onSubmitted: applyCarFilter,
+              onChanged: applyCarFilter,
+              keyboardType: TextInputType.number,
+              decoration: new InputDecoration(
+                  //labelText: 'CarNumber',
+                  hintText: 'Car Filter'),
+            )),
+      ],
+    );
   }
+
   void applyCarFilter(String foo) {
-    globals.globalDerby.sqlCarNumberFilter=foo.toString();
-    globals.globalDerby.derbyDb.recentChangesController.add(triggerTable.toString());
+    globals.globalDerby.sqlCarNumberFilter = foo.toString();
+    globals.globalDerby.derbyDb.recentChangesController
+        .add(triggerTable.toString());
   }
 }

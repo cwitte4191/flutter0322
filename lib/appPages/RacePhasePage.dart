@@ -44,8 +44,12 @@ class RacePhasePageState extends State<RacePhasePage> implements DbRefreshAid {
     int listSize=racePhaseList?.length;
     listSize+=1;  // artificially larger for filter.
 
-    return ListView.builder(
-        itemBuilder: racePhaseItemBuilder, itemCount: listSize);
+    return RefreshIndicator(
+        onRefresh: globals.globalDerby.refreshStatus.doRefresh,
+      child:ListView.builder(
+          itemBuilder: racePhaseItemBuilder, itemCount: listSize)
+    );
+
   }
 
   Widget racePhaseItemBuilder(BuildContext context, int index) {

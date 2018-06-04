@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter0322/DerbyNavDrawer.dart';
 import 'package:flutter0322/appPages/DbRefreshAid.dart';
@@ -36,7 +38,7 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
       ),
       drawer: DerbyNavDrawer.getDrawer(context),
       body: //new TextFormFieldDemo(),
-         getRacerListBodyFromDB(),
+          getRacerListBodyFromDB(),
       floatingActionButton: new FloatingActionButton(
         onPressed: () => requestRefresh(context),
         tooltip: 'Refresh',
@@ -73,8 +75,10 @@ class RacerHomeState extends State<RacerHome> implements DbRefreshAid {
       firstTime = false; // don't initiate query on subsequent build events.
     }
 
-    return ListView.builder(
-        itemBuilder: racerItemBuilder, itemCount: racerDbMap?.length);
+    return RefreshIndicator(
+        onRefresh: globals.globalDerby.refreshStatus.doRefresh,
+        child: ListView.builder(
+            itemBuilder: racerItemBuilder, itemCount: racerDbMap?.length));
   }
 
   @override
