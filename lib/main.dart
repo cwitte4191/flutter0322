@@ -17,8 +17,7 @@ import 'package:flutter0322/widgets/TextDialogDemo.dart';
 //import 'package:pubsub/pubsub.dart';
 
 void main() async {
-  //new GetS3Object().writeCounter(77);
-  //new GetS3Object().getS3ObjectAsFile("foo");
+
  if (false) {
    runApp(new MaterialApp(home: new FocusVisibilityDemo()));
 

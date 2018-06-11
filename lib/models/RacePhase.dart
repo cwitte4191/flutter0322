@@ -58,13 +58,16 @@ class RacePhase
         .add(new RaceEntry(carNumber: car1, lane: 1, resultMS: lane1ResultMS));
     raceEntryList
         .add(new RaceEntry(carNumber: car2, lane: 2, resultMS: lane2ResultMS));
+
+    //TODO: enable assert!
+
+    //assert(resultMS==RaceEntry.getCompatResultMs(raceEntryList));
+    if(resultMS != RaceEntry.getCarNumbers(raceEntryList)){
+      print ("assert: rms: $resultMS list: $raceEntryList");
+    }
   }
 
-  static void marshallRaceEntryListFromRacePair(
-      int resultMS, List<RaceEntry> raceEntryList, RacePair racePair) {
-    marshallRaceEntryList(resultMS, raceEntryList,
-        car1: racePair.car1, car2: racePair.car2);
-  }
+
 
   @override
   Map toJson() {
@@ -101,13 +104,7 @@ class RacePhase
   }
 
   int getCompatResultMs() {
-    var sortedEntries = this.getSortedRaceEntries();
-    RaceEntry winner = sortedEntries[0];
-    RaceEntry place2 = sortedEntries[1];
-    if (winner.resultMS == null) return null;
-
-    int winningMS = place2.resultMS - winner.resultMS;
-    return winningMS;
+    return RaceEntry.getCompatResultMs(this.raceEntryList);
   }
 
   PhaseStatus getPhaseStatus() {
@@ -205,6 +202,15 @@ class RaceEntry {
     }
     return rc;
   }
+  static int getCompatResultMs(List<RaceEntry> raceEntryList) {
+    var sortedEntries = getSortedRaceEntries(raceEntryList);
+    RaceEntry winner = sortedEntries[0];
+    RaceEntry place2 = sortedEntries[1];
+    if (winner.resultMS == null) return null;
+
+    int winningMS = place2.resultMS - winner.resultMS;
+    return winningMS;
+  }
 
   static List<RaceEntry> getSortedRaceEntries(List<RaceEntry> raceEntryList) {
     var rc = raceEntryList.toList();
@@ -231,5 +237,10 @@ class RaceEntry {
       "resultMS": resultMS,
       "finishTtc": finishTtc
     };
+  }
+  @override
+  String toString() {
+    //return toJson() as String;
+    return "RaceEntry $carNumber lane: $lane result $resultMS";
   }
 }

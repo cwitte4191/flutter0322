@@ -23,6 +23,7 @@ dependencies:
 
   semaphore: "^0.0.1"
   sqflite: "^0.8.9"
+  crypto: "^2.0.3"
 
   #path_provider: "^0.4.0"
   cupertino_icons: "^0.1.0"
@@ -30,6 +31,8 @@ dependencies:
   xml: "^3.0.0"
   cached_network_image: "^0.4.1+1"
   pubsub: "^1.1.9"
+
+  #firebase_messaging: "^1.0.1"
 
   #wilt:
   #   path: /Users/cwitte/scratch/wilt

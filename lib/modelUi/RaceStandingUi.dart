@@ -10,15 +10,15 @@ class RaceStandingUi implements DisplayableRace {
   void getResultsSummary(ResultsSummary resultsSummary) {
     int overallWinningCar;
     if (raceStanding.phase1DeltaMS != null) {
-      addResultTime(resultsSummary, "Phase A", raceStanding.racePair,
+      addResultTime(resultsSummary, "Phase A",
           raceStanding.phase1DeltaMS);
     }
     if (raceStanding.phase2DeltaMS != null) {
-      addResultTime(resultsSummary, "Phase B", raceStanding.racePair,
+      addResultTime(resultsSummary, "Phase B",
           raceStanding.phase2DeltaMS);
       int overallMS = raceStanding.phase1DeltaMS + raceStanding.phase2DeltaMS;
       overallWinningCar = addResultTime(
-          resultsSummary, "  Overall", raceStanding.racePair, overallMS);
+          resultsSummary, "  Overall",  overallMS);
     }
 
     if (overallWinningCar != null) {
@@ -38,18 +38,20 @@ class RaceStandingUi implements DisplayableRace {
   }
 
   int addResultTime(ResultsSummary resultsSummary, String phaseLiteral,
-      RacePair racePair, int winningMS) {
+       int winningMS) {
+    int car1=raceStanding.getCarNumbers()[0];
+    int car2=raceStanding.getCarNumbers()[1];
     if (winningMS == 0) {
-      resultsSummary.addMessage(racePair.car1, "$phaseLiteral: Tied");
-      resultsSummary.addMessage(racePair.car2, "$phaseLiteral: Tied");
+      resultsSummary.addMessage(car1, "$phaseLiteral: Tied");
+      resultsSummary.addMessage(car2, "$phaseLiteral: Tied");
       return null;
     }
     int winningCar ;
     if (winningMS < 0) {
-      winningCar = raceStanding.racePair.car2;
+      winningCar = car2;
     }
     if (winningMS > 0) {
-      winningCar = raceStanding.racePair.car1;
+      winningCar = car1;
     }
     String formattedMS=tripleZero.format(winningMS.abs());
     resultsSummary.addMessage(

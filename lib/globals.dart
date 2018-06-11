@@ -3,7 +3,7 @@ library globals;
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter0322/MqttOberver.dart';
+import 'package:flutter0322/network/MqttOberver.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/DerbyDbCache.dart';
 //import 'package:flutter0322/network/FbaseDerby.dart';
@@ -25,6 +25,7 @@ class GlobalDerby {
   File ndJsonPath;
   int ndJsonRefreshInProgress;
   MqttObserver mqttObserver;
+  bool useMqtt=false;
   RefreshStatus refreshStatus=new RefreshStatus();
 
   String sqlCarNumberFilter="";
@@ -38,8 +39,8 @@ class GlobalDerby {
   }
 
   GlobalDerby({this.raceConfig}) {
-    if (raceConfig != null) {
-      //mqttObserver=new MqttObserver(raceConfig.getMqttHostname());
+    if (useMqtt && raceConfig != null) {
+      mqttObserver=new MqttObserver(raceConfig.getMqttHostname());
 
     }
   }
@@ -58,7 +59,11 @@ class GlobalDerby {
     await derbyDb.init(doReset: doResetDb);
     await racerCache.init(derbyDb);
     await raceBracketCache.init(derbyDb);
-    //mqttObserver.init();
+
+    if(useMqtt && mqttObserver!=null) {
+      mqttObserver.init();
+    }
+
     //fbaseDerby.init();
   }
 }

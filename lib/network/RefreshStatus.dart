@@ -11,6 +11,7 @@ class RefreshStatus{
   {
 
   }
+
   Future<Null> doRefresh({RaceConfig raceConfig})async{
     print("doRefresh0");
     int t0=DateTime.now().millisecondsSinceEpoch;

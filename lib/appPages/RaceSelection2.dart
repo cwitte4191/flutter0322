@@ -10,6 +10,7 @@ class RaceSelection2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print ("RaceSelection2: build.");
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(title),

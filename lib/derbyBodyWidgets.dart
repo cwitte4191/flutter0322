@@ -8,11 +8,7 @@ import 'package:flutter0322/widgets/RaceSelectionWidget.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
 class DerbyBodyWidgets {
-  Widget getBody() {
-    new TestData().getRbd();
-    return getTestDataRaceHistoryBody();
-    //return getRacerListBody();
-  }
+
 
   Widget getList2() {
     var textList = [];
@@ -76,65 +72,6 @@ class DerbyBodyWidgets {
         itemCount: raceStandingList.length);
   }
 
-  Widget getTestDataRaceHistoryBody() {
-    print("getRaceHistoryBody begin (test): ");
-
-    var raceStanding = new RaceStanding(car1: 110, car2: 111);
-
-    RacePhase.marshallRaceEntryListFromRacePair(
-        -50, raceStanding.phase1EntryList, raceStanding.racePair);
-    RacePhase.marshallRaceEntryListFromRacePair(
-        200, raceStanding.phase2EntryList, raceStanding.racePair);
-
-    raceStanding.chartPosition = "Heat 23";
-
-    var racePhaseT1 = new RacePhase();
-    racePhaseT1.startMs = 232;
-    racePhaseT1
-        .addRaceEntry(new RaceEntry(lane: 1, carNumber: 101, resultMS: 050));
-    racePhaseT1
-        .addRaceEntry(new RaceEntry(lane: 2, carNumber: 102, resultMS: 0));
-    racePhaseT1.phaseNumber = 1;
-
-    var racePhaseT2 = new RacePhase();
-    racePhaseT2.startMs = 232;
-    racePhaseT2
-        .addRaceEntry(new RaceEntry(lane: 1, carNumber: 201, resultMS: 053));
-    racePhaseT2
-        .addRaceEntry(new RaceEntry(lane: 2, carNumber: 202, resultMS: 0));
-    racePhaseT2.phaseNumber = 2;
-
-    var driverMap = new Map<int, Racer>();
-    driverMap[101] = new Racer(racerName: "Bugs");
-    driverMap[201] = new Racer(racerName: "Bunny");
-    driverMap[202] = new Racer(racerName: "Elmer");
-    driverMap[102] = new Racer(racerName: "Fudd");
-
-    var rpList = new List<Widget>();
-    for (int x = 0; x < 50; x++) {
-      var rrw = null;
-      if (x % 3 == 0) {
-        rrw =
-            new RaceResultWidget(displayableRace: new RacePhaseUi(racePhaseT1));
-      }
-      if (x % 3 == 1) {
-        rrw =
-            new RaceResultWidget(displayableRace: new RacePhaseUi(racePhaseT2));
-      }
-      if (x % 3 == 2) {
-        rrw = new RaceResultWidget(
-            displayableRace: new RaceStandingUi(raceStanding));
-      }
-
-      if (rrw != null) rpList.add(rrw);
-    }
-    //print("racePhase history: $rpList");
-    print("getRaceHistoryBody done: " + rpList.length.toString());
-
-    return new ListView(
-      children: rpList,
-    );
-  }
 
   Widget getRaceSelectionBody(Map<String, String> flist) {
     var raceSelectionList = new List<Widget>();

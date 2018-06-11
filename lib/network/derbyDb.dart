@@ -24,9 +24,8 @@ class DerbyDb {
     File dbFile = new File(dbPath);
     if (!dbFile.existsSync() || doReset) {
       await deleteAndDefine();
-    }
-    else{
-      print ("DerbyDb reusing existing db");
+    } else {
+      print("DerbyDb reusing existing db");
       await openDb();
     }
   }
@@ -34,18 +33,24 @@ class DerbyDb {
   void createFromNetworkStream() {
     fromNetworkController = StreamController.broadcast<HasRelational>();
 
-    fromNetworkController.stream.forEach((model) =>  addNewModel(model));
+    fromNetworkController.stream.forEach((model) => addNewModel(model));
   }
 
   void createRecentChangesStream() {
     recentChangesController = StreamController.broadcast<String>();
-    /*
-    clientEventBus= new events.EventBus();
-    clientEventBus.on(RacePhase).listen(( String event)=> print("Event bus handler2: gotRacePhase:  ${event}") );
+
+    print("createRecentChangesStream begin.");
+    clientEventBus = new events.EventBus();
+    Stream<dynamic> stream = clientEventBus.on(RacePhase);
+
+    stream.listen((event) {
+      print("Event bus handler2: gotRacePhase:  ${event}");
+      return null;
+    });
 
     clientEventBus.fire("foo");
     clientEventBus.fire(new RacePhase());
-    */
+    print("createRecentChangesStream done.");
   }
 
   /*
@@ -55,17 +60,19 @@ class DerbyDb {
   }
   */
 
-  void testBroadcastSink(){
-    final String tbs="testBroadcastSink";
+  void testBroadcastSink() {
+    final String tbs = "testBroadcastSink";
     print("testBroadcastSink $tbs begin.");
-    recentChangesController.stream.listen((istring)=>print("$tbs recentChangesSubscriber1: got $istring"));
-    recentChangesController.stream.listen((istring)=>print("$tbs recentChangesSubscriber2: got $istring"));
+    recentChangesController.stream.listen(
+        (istring) => print("$tbs recentChangesSubscriber1: got $istring"));
+    recentChangesController.stream.listen(
+        (istring) => print("$tbs recentChangesSubscriber2: got $istring"));
 
-    int now=new DateTime.now().millisecondsSinceEpoch;
-    recentChangesController.add("$tbs testBroadcast now:  $now" );
+    int now = new DateTime.now().millisecondsSinceEpoch;
+    recentChangesController.add("$tbs testBroadcast now:  $now");
 
     countStream(5).pipe(recentChangesController);
-   // countStream(8).pipe(recentChangesController);
+    // countStream(8).pipe(recentChangesController);
   }
 
   Stream<String> countStream(int to) async* {
@@ -73,15 +80,14 @@ class DerbyDb {
       yield i.toString();
     }
   }
+
   Future deleteAndDefine() async {
     print("deleteAndDefine: beginning.");
     await deleteDatabase(dbPath);
 
     print("deleteAndDefine: opening.");
 
-
-    await  openDb();
-
+    await openDb();
 
     print("deleteAndDefine: inserting");
 
@@ -106,25 +112,30 @@ class DerbyDb {
       return database.execute(args.item1, args.item2);
     }
   }
-  final RecentWatch recentWatch=new RecentWatch();
+  Batch getBatch(){
+    return database.batch();
+
+  }
+
+
+  final RecentWatch recentWatch = new RecentWatch();
 
   Future addNewModel(HasRelational model) async {
     await execute(model.generateSql());
-    recentWatch.receivedInput(this,model.runtimeType.toString());
-
+    recentWatch.receivedInput(this, model.runtimeType.toString());
   }
 
   Future openDb() async {
     // open the database
     database =
-    await openDatabase(dbPath, version: 2, onOpen: (Database db) async {
+        await openDatabase(dbPath, version: 2, onOpen: (Database db) async {
       print("deleteAndDefine: onOpen Beginning.");
     }, onCreate: (Database db, int version) async {
       print("deleteAndDefine: onCreate Beginning.");
 
       // When creating the db, create the table
       await db.execute(
-        //    "CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
+          //    "CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
           "CREATE TABLE Derby (id INTEGER PRIMARY KEY, datatype TEXT, json TEXT)");
       await db.execute(Racer.getCreateSql());
       await db.execute(RacePhase.getCreateSql());
@@ -133,41 +144,44 @@ class DerbyDb {
       print("deleteAndDefine: create complete.");
     });
   }
-
-
 }
-class RecentWatch{
-  Duration recentDuration = new Duration(seconds:1);
+
+class RecentWatch {
+  Duration recentDuration = new Duration(seconds: 1);
   Timer recentTimer;
-  int recentTimeMS=0;
-  Set<String> recentModels=new HashSet();
+  int recentTimeMS = 0;
+  Set<String> recentModels = new HashSet();
 
   DerbyDb derbyDb;
   RecentWatch();
 
-
-  void receivedInput(DerbyDb derbyDb,String modelString){
-    this.derbyDb=derbyDb;
-
+  void receivedInput(DerbyDb derbyDb, String modelString) {
+    this.derbyDb = derbyDb;
 
     recentModels.add(modelString);
-    recentTimeMS=DateTime.now().millisecondsSinceEpoch;
+    recentTimeMS = DateTime.now().millisecondsSinceEpoch;
 
-    if(recentTimer!=null && recentTimer.isActive){
+    if (recentTimer != null && recentTimer.isActive) {
       recentTimer.cancel();
     }
-    recentTimer=new Timer(recentDuration,recentPublishActivity);
+    recentTimer = new Timer(recentDuration, recentPublishActivity);
   }
+
   // recent changes is intended to cause a UI refresh/repaint
   //   don't do this for every record, just once after the refresh.
   void recentPublishActivity() {
-    if(this.derbyDb==null) return;
+    if (this.derbyDb == null) return;
 
     //TODO syncronization may be needed!
-    var now=DateTime.now();
-    for(String recentModel in recentModels) {
+    var now = DateTime.now();
+    for (String recentModel in recentModels) {
       print("recentPublishActivity: $now $recentModel");
       derbyDb.recentChangesController.add(recentModel);
     }
   }
+}
+class PendingSql{
+  HashSet<String> pendingTypes=new HashSet();
+  List <Tuple2<String, List<dynamic>>> pendingSql=new List();
+
 }

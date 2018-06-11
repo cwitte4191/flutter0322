@@ -8,12 +8,12 @@ class RaceStanding implements HasRelational, HasCarNumbers{
   final phase1EntryList = new List<RaceEntry>();
   final phase2EntryList = new List<RaceEntry>();
 
+  // compat storage for 2 car race.
+  final List<int> carNumbers=[];
   int phase1DeltaMS; // planning transition to raceEntries
   int phase2DeltaMS; // planning transition
-  RacePair racePair;
   bool isDeleted;
 
-  RaceStanding({car1: int, car2: int}) : racePair = new RacePair(car1, car2);
 
   RaceStanding.fromSqlMap(Map jsonMap) {
     initFromMap(jsonMap);
@@ -29,19 +29,23 @@ class RaceStanding implements HasRelational, HasCarNumbers{
     phase1DeltaMS = jsonMap["phase1DeltaMS"];
     phase2DeltaMS = jsonMap["phase2DeltaMS"];
 
-    racePair = new RacePair(jsonMap["carNumber1"], jsonMap["carNumber2"]);
     RacePhase.marshallRaceEntryList(phase1DeltaMS, phase1EntryList,
         car1: jsonMap["carNumber1"], car2: jsonMap["carNumber2"]);
     RacePhase.marshallRaceEntryList(phase2DeltaMS, phase2EntryList,
         car1: jsonMap["carNumber1"], car2: jsonMap["carNumber2"]);
 
+    carNumbers.clear();
+    carNumbers.add(0);  // prime the array with 2 carnumbers to avoid range error
+    carNumbers.add(0);
+    carNumbers[0]=jsonMap["carNumber1"];
+    carNumbers[1]=jsonMap["carNumber2"];
 
     this.isDeleted=parseIsDeleted(jsonMap["isDeleted"]);
   }
 
   @override
   List<int> getCarNumbers() {
-    return []..add(racePair.car1)..add(racePair.car2);
+    return carNumbers;
   }
 
   RaceMetaData getRaceMetaData({Map<int, RaceBracket> bracketMap}) {

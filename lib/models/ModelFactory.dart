@@ -14,6 +14,7 @@ class ModelFactory {
     //print("ModelFactory: loadDb $jsonString");
 
     String serializedName = jsonMap["sn"];
+    print("ModelFactory: loadDb $serializedName");
 
     HasRelational rc;
     switch (serializedName) {
@@ -29,7 +30,7 @@ class ModelFactory {
       case "RaceBracket":
         rc = new RaceBracket.fromJsonMap(jsonMap["data"]);
         RaceBracket rb=rc as RaceBracket;
-        print ("ModelFactory: ${rb.jsonDetail}");
+        //print ("ModelFactory: ${rb.jsonDetail}");
 
         if((rc as RaceBracket).id ==null){
           rc=null;

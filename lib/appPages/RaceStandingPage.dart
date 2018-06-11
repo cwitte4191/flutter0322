@@ -74,7 +74,7 @@ class RaceStandingPageState extends State<RaceStandingPage>
     globals.globalDerby.derbyDb?.database
         ?.rawQuery(RaceStanding.getSelectSql(
             getPending: getPending,
-            carFilter: globals.globalDerby.sqlCarNumberFilter))
+              carFilter: globals.globalDerby.sqlCarNumberFilter))
         ?.then((list) {
       print("RaceStanding: repopulateList! $list");
 

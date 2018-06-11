@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter0322/models/ModelFactory.dart';
+import 'package:flutter0322/network/Md5Utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:xml/xml/nodes/document.dart';
@@ -112,6 +113,7 @@ class GetS3Object {
     if (response.statusCode == 416) {
       print("_resumeS3ObjectAsFile: NOOP");
 
+      new Md5Utils().calcMd5(mainFileName);
       return mainFileName;
     }
 
@@ -257,15 +259,25 @@ class RefreshData {
         .transform(new LineSplitter());
     await republishStream(lineStream);
 
+
+    new Md5Utils().calcMd5(ndjson);
   }
 
   static Future<int> republishStream(Stream<String> stream) async {
+    int lineNumber=0;
+    Batch batch
     try {
       await for (var line in stream) {
+        print("republishStream line: $lineNumber");
+        lineNumber++;
         print("republishStream: $line");
         await ModelFactory.loadDb(line);
       }
     } catch (e) {
+      print("republishStream: error: $e type: ${e.runtimeType}");
+      RangeError re=e;
+      print("stack: ${re.stackTrace}");
+
       return -1;
     }
     return 0;

@@ -45,6 +45,3 @@ class RacePair {
 
 }
 
-abstract class HasRacePairs {
-  List<RacePair> getRacePairs();
-}
