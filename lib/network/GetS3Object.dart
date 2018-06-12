@@ -59,9 +59,10 @@ class GetS3Object {
   }
 
   Future<File> tmpFile() async {
-    var ms=new DateTime.now().millisecondsSinceEpoch.toString();
+    var ms = new DateTime.now().millisecondsSinceEpoch.toString();
     return _localFile(fileName: "dataLog_${ms}.ndjson");
   }
+
   Future<File> ndJsonFile() async {
     return _localFile(fileName: "dataLog.ndjson");
   }
@@ -109,25 +110,29 @@ class GetS3Object {
       return request;
     }).then((HttpClientRequest request) => request.close());
 
+    response.headers.forEach((String name, List<String> vals){
+      print ("response hdr $name $vals");
+    });
+
+
     print("http response status: ${response.statusCode}");
     if (response.statusCode == 416) {
       print("_resumeS3ObjectAsFile: NOOP");
 
-      new Md5Utils().calcMd5(mainFileName);
+      new Md5Utils().calcSha1(mainFileName);
       return mainFileName;
     }
 
     if (response.statusCode == 206) {
-      var myTmpFile=await tmpFile();
+      var myTmpFile = await tmpFile();
       print("_resumeS3ObjectAsFile: resuming with partial download");
 
       //IOSink sinkDelta = mainFileName.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
       IOSink sinkDelta = myTmpFile.openWrite();
       await response.pipe(sinkDelta);
 
-
       await RefreshData.parseAndLoadFile(myTmpFile);
-      await concatenate(appendee: mainFileName, appendage:myTmpFile);
+      await concatenate(appendee: mainFileName, appendage: myTmpFile);
       await myTmpFile.delete();
     }
     await getFileLength(mainFileName, "_resume Done");
@@ -138,15 +143,13 @@ class GetS3Object {
     return mainFileName;
   }
 
-  Future concatenate({File appendee,File appendage})async {
+  Future concatenate({File appendee, File appendage}) async {
     IOSink sinkDelta = appendee.openWrite(mode: FileMode.WRITE_ONLY_APPEND);
     Stream<List<int>> inputStream = appendage.openRead();
 
     await inputStream.pipe(sinkDelta);
-
-
-
   }
+
   void foo1(String target) async {
     await new HttpClient()
         .getUrl(Uri.parse(target))
@@ -179,6 +182,10 @@ class GetS3Object {
       request.headers..add(HttpHeaders.CONTENT_TYPE, "text/plain");
       return request;
     }).then((HttpClientRequest request) => request.close());
+
+    response.headers.forEach((String name, List<String> vals){
+      print ("response hdr fromfile $name $vals");
+    });
 
     await response.pipe(fname.openWrite());
 
@@ -233,11 +240,9 @@ class RefreshData {
     String url = "${raceConfig.s3BucketUrlPrefix}/dataLog.ndjson";
 
     File ndjson = await gs30.ndJsonFile();
-    if (false) {
-      ndjson = await gs30.getS3ObjectAsFile(url, ndjson);
-    } else {
-      ndjson = await gs30._resumeS3ObjectAsFile(url, ndjson);
-    }
+
+    ndjson = await gs30._resumeS3ObjectAsFile(url, ndjson);
+
     globals.globalDerby.ndJsonPath = ndjson;
     ptime.add(DateTime.now().millisecondsSinceEpoch);
 
@@ -248,9 +253,10 @@ class RefreshData {
     ptime.add(DateTime.now().millisecondsSinceEpoch);
 
     reportElapsed(ptime);
-    return ;
+    return;
   }
-  static Future parseAndLoadFile(File ndjson)async {
+
+  static Future parseAndLoadFile(File ndjson) async {
     Stream<List<int>> inputStream = ndjson.openRead();
     int accumulatedBytes = 0;
 
@@ -259,46 +265,45 @@ class RefreshData {
         .transform(new LineSplitter());
     await republishStream(lineStream);
 
-
-    new Md5Utils().calcMd5(ndjson);
+    new Md5Utils().calcSha1(ndjson);
   }
 
   static Future<int> republishStream(Stream<String> stream) async {
-    int lineNumber=0;
-    Batch batch
+    int t0 = DateTime.now().millisecondsSinceEpoch;
+    bool defer = true;
+
     try {
       await for (var line in stream) {
-        print("republishStream line: $lineNumber");
-        lineNumber++;
-        print("republishStream: $line");
-        await ModelFactory.loadDb(line);
+        await ModelFactory.loadDb(line, defer: defer);
       }
+      globals.globalDerby.derbyDb.flushPendingBatch();
     } catch (e) {
       print("republishStream: error: $e type: ${e.runtimeType}");
-      RangeError re=e;
+      RangeError re = e;
       print("stack: ${re.stackTrace}");
 
       return -1;
     }
+    int t1 = DateTime.now().millisecondsSinceEpoch;
+    int elapsed = t1 - t0;
+    print("republishStream: defer: $defer elapsed: $elapsed");
+
     return 0;
   }
 
   void reportElapsed(List<int> ptime) {
     int prev;
-    int x=0;
-    for(int thisTime in ptime){
-      if(prev!=null){
-        int delta=thisTime- prev;
+    int x = 0;
+    for (int thisTime in ptime) {
+      if (prev != null) {
+        int delta = thisTime - prev;
         print("elapsedDelta $x: ${delta}");
       }
 
-      prev=thisTime;
+      prev = thisTime;
       x++;
     }
-
   }
-
-
 }
 
 class RaceConfig {
@@ -326,19 +331,20 @@ class RaceConfig {
         raceName: raceName);
   }
 
-  String getMqttHostname(){
-    String rc=applicationUrl;
+  String getMqttHostname() {
+    String rc = applicationUrl;
     print("getMqttHostname: $rc");
     //TODO: build uri/url and get hostname.  did not find a relevant constructor :-(
-    rc=rc.replaceAll("http://", "");
-    rc=rc.replaceAll("root@", "");
-    Pattern p=new RegExp(":");
-    List<String>rcSplit=rc.split(new RegExp(":"));
-    rc=rcSplit[0];
+    rc = rc.replaceAll("http://", "");
+    rc = rc.replaceAll("root@", "");
+    Pattern p = new RegExp(":");
+    List<String> rcSplit = rc.split(new RegExp(":"));
+    rc = rcSplit[0];
     print("getMqttHostname: gave: $rc");
 
     return rc;
   }
+
   Future persistToFile() async {
     File rcFile = await new GetS3Object().raceConfigFile();
     var json = new JsonCodec();

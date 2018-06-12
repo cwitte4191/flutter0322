@@ -16,6 +16,10 @@ class DerbyDb {
   StreamController<String> recentChangesController;
   events.EventBus clientEventBus;
 
+  final PendingSql pendingSql;
+
+  DerbyDb() : pendingSql = new PendingSql();
+
   Future init({bool doReset}) async {
     createFromNetworkStream();
     createRecentChangesStream();
@@ -28,6 +32,10 @@ class DerbyDb {
       print("DerbyDb reusing existing db");
       await openDb();
     }
+  }
+
+  Future flushPendingBatch() async {
+    await pendingSql.doFlush(this);
   }
 
   void createFromNetworkStream() {
@@ -108,21 +116,23 @@ class DerbyDb {
   Future execute(Tuple2<String, List<dynamic>> args) async {
     if (args != null && args.item1 != null) {
       //print ("derbyDb.execute from Stream: ${args.item1}");
-
       return database.execute(args.item1, args.item2);
     }
   }
-  Batch getBatch(){
+
+  Batch getBatch() {
     return database.batch();
-
   }
-
 
   final RecentWatch recentWatch = new RecentWatch();
 
-  Future addNewModel(HasRelational model) async {
-    await execute(model.generateSql());
-    recentWatch.receivedInput(this, model.runtimeType.toString());
+  Future addNewModel(HasRelational model, {bool defer: false}) async {
+    if (defer) {
+      await pendingSql.add(this, model);
+    } else {
+      await execute(model.generateSql());
+      recentWatch.receivedInput(this, model.runtimeType.toString());
+    }
   }
 
   Future openDb() async {
@@ -180,8 +190,41 @@ class RecentWatch {
     }
   }
 }
-class PendingSql{
-  HashSet<String> pendingTypes=new HashSet();
-  List <Tuple2<String, List<dynamic>>> pendingSql=new List();
 
+class PendingSql {
+  HashSet<String> pendingTypes = new HashSet();
+  List<Tuple2<String, List<dynamic>>> pendingSqlList = new List();
+
+  PendingSql();
+
+  Future add(DerbyDb derbyDb, HasRelational model) async {
+    pendingSqlList.add(model.generateSql());
+    pendingTypes.add(model.runtimeType.toString());
+    await potentialFlush(derbyDb);
+  }
+
+  Future potentialFlush(DerbyDb derbyDb) async {
+    if (pendingSqlList.length > 200) {
+      await doFlush(derbyDb);
+    }
+  }
+
+  Future doFlush(DerbyDb derbyDb) async {
+    if (pendingSqlList.length == 0) return;
+
+    print ("doFlush BEGIN: ${pendingSqlList.length}");
+    Batch batch = derbyDb.getBatch();
+    for (Tuple2<String, List<dynamic>> x in pendingSqlList) {
+      batch.execute(x.item1, x.item2);
+    }
+    await batch.commit(exclusive: false, noResult: true);
+
+    for (String modelType in this.pendingTypes) {
+      derbyDb.recentWatch.receivedInput(derbyDb, modelType);
+    }
+    pendingSqlList.clear();
+    pendingTypes.clear();
+    print ("doFlush COMPLETE.");
+
+  }
 }

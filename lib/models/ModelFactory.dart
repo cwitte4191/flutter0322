@@ -5,7 +5,7 @@ import 'package:flutter0322/models.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
 class ModelFactory {
-  static Future<HasRelational> loadDb(String jsonString) async {
+  static Future<HasRelational> loadDb(String jsonString, {bool defer: true}) async {
     var jsonMap = JSON.decode(jsonString);
     if (jsonMap["type"] == "Remove") {
       jsonMap["data"]["isDeleted"]=1; // integer for interop with sqlite
@@ -41,7 +41,7 @@ class ModelFactory {
 
     //if (rc != null) globals.globalDerby.derbyDb.fromNetworkController.add(rc);
     if (rc != null) {
-      await globals.globalDerby.derbyDb.addNewModel(rc);
+      await globals.globalDerby.derbyDb.addNewModel(rc,defer: defer);
     }
     return rc;
   }
