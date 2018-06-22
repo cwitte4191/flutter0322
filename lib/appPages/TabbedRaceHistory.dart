@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter0322/DerbyNavDrawer.dart';
+import 'package:flutter0322/appPages/DbRefreshAid.dart';
 import 'package:flutter0322/appPages/RacePhasePage.dart';
 import 'package:flutter0322/appPages/RaceStandingPage.dart';
 import 'package:flutter0322/models.dart';
@@ -18,11 +19,17 @@ class TabbedRaceHistory extends StatefulWidget{
 class _TabbedRaceHistoryState extends State<TabbedRaceHistory> with SingleTickerProviderStateMixin{
   String title="Update me";
 
+  bool showFab=false;
 
   final List<Tab> myTabs = <Tab>[
     new Tab(text: 'Phases'),
     new Tab(text: 'Heats'),
     new Tab(text: 'Pending'),
+  ];
+  final List<Widget>myTabViews= [
+    new RacePhasePage(),
+    new RaceStandingPage(historyType:HistoryType.Standing),
+    new RaceStandingPage(historyType:HistoryType.Pending),
   ];
   _TabbedRaceHistoryState();
   TabController _tabController;
@@ -37,6 +44,7 @@ class _TabbedRaceHistoryState extends State<TabbedRaceHistory> with SingleTicker
     print( "_tabcontroller index: ${_tabController.index}");
     setState(() {
       syncTitleToTabName();
+      syncFab();
     });
   }
 
@@ -44,6 +52,31 @@ class _TabbedRaceHistoryState extends State<TabbedRaceHistory> with SingleTicker
     title=myTabs[_tabController.index].text;
 
   }
+  void syncFab(){
+
+    //showFab=!showFab;
+    showFab=globals.globalDerby.isLoggedIn;
+
+
+  }
+  Widget getTabFab(BuildContext context){
+    print ("getTabFab");
+    try {
+      Widget rc = (myTabViews[_tabController.index] as WidgetsWithFab).getFab(context);
+      print ("getTabFab: $rc");
+
+      if (rc != null) {
+        return rc;
+      }
+    }
+    catch(e){
+      print("getTabFab failed: $e");
+    }
+    return new Container();
+
+  }
+
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -73,30 +106,17 @@ class _TabbedRaceHistoryState extends State<TabbedRaceHistory> with SingleTicker
       drawer: DerbyNavDrawer.getDrawer(context),
       body: new TabBarView(
           controller: _tabController,
-          children: <Widget>[new RacePhasePage(),new RaceStandingPage(historyType:HistoryType.Standing),new  RaceStandingPage(historyType:HistoryType.Pending)]
+          children: myTabViews,
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: ()=>          requestRefresh(context)
-        ,
-        tooltip: 'Refresh',
-        child: new Icon(Icons.refresh),
-      ), // This tr
+      floatingActionButton: getTabFab(context), // This tr
     );
 
     return scaffold;
 
   }
-  void requestRefresh(BuildContext context) async{
-    await globals.globalDerby.refreshStatus.doRefresh();
 
-/*
-    Navigator.push(
-        context,
-        new MaterialPageRoute(
-            builder: (context) => new TabbedRaceHistory()));
-            */
+  requestRefresh(BuildContext context) {}
 
-  }
 
 
 

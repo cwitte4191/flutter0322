@@ -12,7 +12,7 @@ import 'package:flutter0322/network/RefreshStatus.dart';
 import 'package:flutter0322/network/derbyDb.dart';
 
 class GlobalDerby {
-  bool isLoggedIn = false;
+  bool isLoggedIn = true;
   final RaceConfig raceConfig;
   //Map<int, Racer> racerMap=new Map();
   //Map<int, RaceBracket> bracketMap=new Map();

@@ -24,8 +24,9 @@ class RaceResultWidget extends StatelessWidget {
       bgColor=Colors.red;
     }
     if(displayableRace.getRaceMetaData().phaseStatus==PhaseStatus.pending){
-     // bgColor=HexColor('FF7cfc00');
-      bgColor=Colors.green;
+     //bgColor=HexColor('FF7cfc00');
+     bgColor=const Color(0xFF7cfc00);
+     // bgColor=Colors.green;
 
     }
     Widget tableWidget = new Table(
@@ -50,11 +51,20 @@ class RaceResultWidget extends StatelessWidget {
   }
 
   static Widget _getFixedFFWidget() {
-    return new Image(
+    return const Image(
         width: 60.0,
         height: 60.0,
         fit: BoxFit.scaleDown,
-        image: new AssetImage("images/finish_flag.png"));
+        image: const AssetImage("images/finish_flag.png"));
+  }
+
+  static Widget _getFixedFFWidgetNoConst() {
+    return new Image.asset(
+        "images/finish_flag.png",
+        width: 60.0,
+        height: 60.0,
+        fit: BoxFit.scaleDown,
+    );
   }
 
   List<TableRow> getChildTableRows(DisplayableRace displayableRace) {

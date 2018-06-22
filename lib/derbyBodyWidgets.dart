@@ -20,28 +20,6 @@ class DerbyBodyWidgets {
     );
   }
 
-  Widget getBracketListBody() {
-    var bracketWidgetList = new List<Widget>();
-    int rowNum = 0;
-    void add1Bracket(int key, RaceBracket raceBracket) {
-      Color bg = rowNum++ % 2 == 0 ? Colors.grey : null;
-      bracketWidgetList.add(new RaceBracketWidget(
-        raceBracket: raceBracket,
-        bgColor: bg,
-      ));
-    }
-
-    Map<int, RaceBracket> bracketMap =
-        globals.globalDerby.getRaceBrakcetCache();
-    print("getBracketListBody2: ${bracketMap.length}");
-    bracketMap.forEach(add1Bracket);
-
-    return RefreshIndicator(
-        onRefresh: globals.globalDerby.refreshStatus.doRefresh,
-        child: new ListView(
-          children: bracketWidgetList,
-        ));
-  }
 
   Widget getRaceStandingHistoryBody(Map<int, RaceStanding> standingMap) {
     print("getRaceStandingHistoryBody: begin");

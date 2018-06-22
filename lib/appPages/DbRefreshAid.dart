@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
 abstract class DbRefreshAid {
@@ -20,4 +21,8 @@ abstract class DbRefreshAid {
 
   bool isWidgetMounted();
   bool queryDataFromDb();
+}
+
+abstract class WidgetsWithFab {
+  Widget getFab(BuildContext context);
 }

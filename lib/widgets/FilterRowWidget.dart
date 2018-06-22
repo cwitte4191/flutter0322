@@ -48,8 +48,11 @@ class FilterRowWidgetState extends State<FilterRowWidget> {
     );
   }
 
-  void applyCarFilter(String foo) {
-    globals.globalDerby.sqlCarNumberFilter = foo.toString();
+  void applyCarFilter(String carFilter) {
+    //skip already processed changes.
+    if(carFilter == globals.globalDerby.sqlCarNumberFilter) return;
+
+    globals.globalDerby.sqlCarNumberFilter = carFilter;
     globals.globalDerby.derbyDb.recentChangesController
         .add(triggerTable.toString());
   }
