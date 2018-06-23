@@ -54,14 +54,13 @@ class RaceBracketWidget extends StatelessWidget {
   }
 
   void handleLongPress(BuildContext context) {
-    if (!globals.globalDerby.isLoggedIn) {
-      return;
+    if (globals.globalDerby.loginCredentials.canChangeBracketName()) {
+      Navigator.of(context).push(new MaterialPageRoute<Null>(
+          builder: (BuildContext context) {
+            return new EditRaceBracketDialog(raceBracket);
+          },
+          fullscreenDialog: true));
     }
-    Navigator.of(context).push(new MaterialPageRoute<Null>(
-        builder: (BuildContext context) {
-          return new EditRaceBracketDialog(raceBracket);
-        },
-        fullscreenDialog: true));
   }
 }
 

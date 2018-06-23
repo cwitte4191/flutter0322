@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter0322/appPages/AddPendingCarsDialog.dart';
 import 'package:flutter0322/appPages/DbRefreshAid.dart';
 import 'package:flutter0322/appPages/RaceStandingPage.dart';
 import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
@@ -16,6 +17,10 @@ class RacePhasePage extends StatefulWidget implements WidgetsWithFab {
 
   @override
   Widget getFab(BuildContext context) {
+    if(! globals.globalDerby.loginCredentials.canAddRacePhase()){
+      return new Container();
+    }
+
     return new FloatingActionButton(
       onPressed: () {
         onFabClicked(context);
@@ -26,9 +31,7 @@ class RacePhasePage extends StatefulWidget implements WidgetsWithFab {
   }
 
   void onFabClicked(BuildContext context) {
-    if (!globals.globalDerby.isLoggedIn) {
-      return;
-    }
+
     Navigator.of(context).push(new MaterialPageRoute<Null>(
         builder: (BuildContext context) {
           return new AddPendingCarsDialog(

@@ -12,7 +12,8 @@ import 'package:flutter0322/network/RefreshStatus.dart';
 import 'package:flutter0322/network/derbyDb.dart';
 
 class GlobalDerby {
-  bool isLoggedIn = true;
+  bool isLoggedIn = false;
+  LoginCredentials loginCredentials=new LoginCredentials(loginRole: LoginRole.None);
   final RaceConfig raceConfig;
   //Map<int, Racer> racerMap=new Map();
   //Map<int, RaceBracket> bracketMap=new Map();
@@ -64,8 +65,35 @@ class GlobalDerby {
       mqttObserver.init();
     }
 
+    setLoginCredentials(new LoginCredentials(loginRole: LoginRole.Timer));
     //fbaseDerby.init();
   }
-}
+  setLoginCredentials(LoginCredentials loginCredentials){
+    this.loginCredentials=loginCredentials;
 
+    isLoggedIn=(loginCredentials!=null);
+
+  }
+}
+enum LoginRole{ None, Timer, Starter, Admin}
+
+class LoginCredentials {
+
+  final LoginRole loginRole;
+  LoginCredentials({this.loginRole});
+
+  bool canAddRacePhase(){
+    return (this.loginRole==LoginRole.Starter || this.loginRole==LoginRole.Admin|| this.loginRole==LoginRole.Timer);
+  }
+
+  bool canAddPendingRace() {
+    return ( this.loginRole==LoginRole.Admin|| this.loginRole==LoginRole.Timer);
+  }
+
+
+  bool canChangeBracketName() {
+    return ( this.loginRole==LoginRole.Admin|| this.loginRole==LoginRole.Timer);
+
+  }
+}
 GlobalDerby globalDerby = new GlobalDerby();
