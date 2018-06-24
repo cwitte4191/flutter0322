@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter0322/appPages/AddPendingCarsDialog.dart';
+import 'package:flutter0322/dialogs/AddPendingCarsDialog.dart';
 import 'package:flutter0322/appPages/DbRefreshAid.dart';
 import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
+import 'package:flutter0322/globals.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/widgets/FilterRowWidget.dart';
@@ -19,9 +20,11 @@ class RaceStandingPage extends StatefulWidget implements WidgetsWithFab {
   }
   @override
   Widget getFab(BuildContext context) {
-    print ("getFab role: ${globals.globalDerby.loginCredentials.loginRole}");
+    InheritedLoginWidget ilw=InheritedLoginWidget.of(context);
 
-    if(! globals.globalDerby.loginCredentials.canAddPendingRace()){
+    print ("getFab role: ${ilw.loginCredentials.loginRole}");
+
+    if(! ilw.loginCredentials.canAddPendingRace()){
       print ("getFab role: early bailout/return");
 
       return new Container();

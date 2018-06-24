@@ -76,6 +76,7 @@ class AddPendingCarsDialogState extends State<AddPendingCarsDialog> {
             new FlatButton(
                 onPressed: () {
                   // TODO: save cars on server!
+                  _laneCarList.forEach((f){print("saving car number: $f");});
                   Navigator.of(context).pop();
                 },
                 child: new Text('SAVE',
@@ -100,7 +101,7 @@ class AddPendingCarsDialogState extends State<AddPendingCarsDialog> {
   Widget getInputTile({int laneNumber}){
     int laneIndex=laneNumber-1;
     bool autoFocusBoolean=(laneIndex==0);
-
+print ("laneIndex size: "+_laneCarList.length.toString());
     return new ListTile(
       leading: new Icon(Icons.speaker_notes, color: Colors.grey[500]),
       title: new TextFormField(
@@ -110,7 +111,7 @@ class AddPendingCarsDialogState extends State<AddPendingCarsDialog> {
         controller: __editControllerList[laneIndex],
         keyboardType:TextInputType.number,
         maxLength:3,
-        //onSaved: _laneCarList[laneIndex],
+        onSaved: (carString){_laneCarList[laneIndex]=carString;},
         validator: derbyCarOnly,
         autovalidate: true,
         style: carStyle,
@@ -122,6 +123,10 @@ class AddPendingCarsDialogState extends State<AddPendingCarsDialog> {
       ),
     );
   }
+   void onSaveSetter(String newValue){
+
+   }
+
   String derbyCarOnly(String x){
     print("derby validator $x");
 

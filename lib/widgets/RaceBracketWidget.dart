@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter0322/appPages/TabbedBracket.dart';
+import 'package:flutter0322/globals.dart';
 import 'package:flutter0322/modelUi.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/globals.dart' as globals;
@@ -54,7 +55,10 @@ class RaceBracketWidget extends StatelessWidget {
   }
 
   void handleLongPress(BuildContext context) {
-    if (globals.globalDerby.loginCredentials.canChangeBracketName()) {
+    final InheritedLoginWidget inheritedLoginWidget = InheritedLoginWidget.of(context);
+
+    print ("inherited credentials widget2: ${inheritedLoginWidget.loginCredentials.loginRole}");
+    if (inheritedLoginWidget.loginCredentials.canChangeBracketName()) {
       Navigator.of(context).push(new MaterialPageRoute<Null>(
           builder: (BuildContext context) {
             return new EditRaceBracketDialog(raceBracket);

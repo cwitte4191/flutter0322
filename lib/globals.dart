@@ -3,6 +3,7 @@ library globals;
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter0322/network/MqttOberver.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/DerbyDbCache.dart';
@@ -65,8 +66,6 @@ class GlobalDerby {
       mqttObserver.init();
     }
 
-    setLoginCredentials(new LoginCredentials(loginRole: LoginRole.Timer));
-    //fbaseDerby.init();
   }
   setLoginCredentials(LoginCredentials loginCredentials){
     this.loginCredentials=loginCredentials;
@@ -80,7 +79,12 @@ enum LoginRole{ None, Timer, Starter, Admin}
 class LoginCredentials {
 
   final LoginRole loginRole;
-  LoginCredentials({this.loginRole});
+  final String sessionId;
+  LoginCredentials({this.loginRole:LoginRole.None, this.sessionId});
+
+  //TODO: we can apparently use built_value for equals check..
+  //https://github.com/google/built_value.dart
+  bool operator ==(o) => o is LoginCredentials && o.loginRole == loginRole && o.sessionId == sessionId;
 
   bool canAddRacePhase(){
     return (this.loginRole==LoginRole.Starter || this.loginRole==LoginRole.Admin|| this.loginRole==LoginRole.Timer);
@@ -95,5 +99,18 @@ class LoginCredentials {
     return ( this.loginRole==LoginRole.Admin|| this.loginRole==LoginRole.Timer);
 
   }
+}
+class InheritedLoginWidget extends InheritedWidget {
+   LoginCredentials loginCredentials;
+
+  InheritedLoginWidget({this.loginCredentials, child}): super(child:child);
+
+  static InheritedLoginWidget of(BuildContext context) {
+    return (context.inheritFromWidgetOfExactType(InheritedLoginWidget) as InheritedLoginWidget);
+  }
+
+  @override
+  bool updateShouldNotify(InheritedLoginWidget old) =>
+      loginCredentials != old.loginCredentials ;
 }
 GlobalDerby globalDerby = new GlobalDerby();

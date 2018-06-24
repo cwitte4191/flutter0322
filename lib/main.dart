@@ -3,6 +3,7 @@ import 'package:flutter0322/appPages/BracketList.dart';
 import 'package:flutter0322/appPages/RacerPage.dart';
 import 'package:flutter0322/appPages/SplashPage.dart';
 import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
+import 'package:flutter0322/globals.dart';
 import 'package:flutter0322/models.dart';
 import 'package:flutter0322/network/GetS3Object.dart';
 
@@ -17,12 +18,11 @@ import 'package:flutter0322/widgets/TextDialogDemo.dart';
 //import 'package:pubsub/pubsub.dart';
 
 void main() async {
+  if (false) {
+    runApp(new MaterialApp(home: new FocusVisibilityDemo()));
 
- if (false) {
-   runApp(new MaterialApp(home: new FocusVisibilityDemo()));
-
-   return;
- }
+    return;
+  }
   //new MqttTest().mains();
   /*
   const oneSec = const Duration(seconds:5);
@@ -44,7 +44,13 @@ void main() async {
     homeWidget = new SplashScreen();
   }
 
-  runApp(new MaterialApp(
+  runApp(new InheritedLoginWidget(
+      loginCredentials: globals.globalDerby.loginCredentials,
+      child: getApp(homeWidget: homeWidget)));
+}
+
+Widget getApp({Widget homeWidget}) {
+  return new MaterialApp(
     title: 'Flutter Demo',
     theme: new ThemeData(
       primarySwatch: Colors.green,
@@ -55,10 +61,8 @@ void main() async {
       "/Racers": (BuildContext context) => new RacerHome(),
       "/Brackets": (BuildContext context) => new BracketList(),
       "/RacesTab": (BuildContext context) => new TabbedRaceHistory(),
-
-
     },
-  ));
+  );
 }
 
 void handleTimeout(Timer t) {

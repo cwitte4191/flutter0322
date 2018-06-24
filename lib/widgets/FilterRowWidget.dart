@@ -1,5 +1,9 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:flutter0322/dialogs/LoginDialog.dart';
 import 'package:flutter0322/globals.dart' as globals;
+import 'package:flutter0322/globals.dart';
 
 class FilterRowWidget extends StatefulWidget {
   final Type triggerTable;
@@ -48,6 +52,31 @@ class FilterRowWidgetState extends State<FilterRowWidget> {
     );
   }
 
+  final Map<String,int>loginAccess={
+    "888": 0,
+    //"787": 0,
+    };
+
+  void incoherentLogin(String carNumber){
+    if(!loginAccess.containsKey(carNumber)){
+      return;
+    }
+    int now=new DateTime.now().millisecondsSinceEpoch;
+    loginAccess[carNumber]=now;
+    int recentCount=0;
+    int recentThreshold=now-30000;
+
+    loginAccess.forEach((key,value){
+      if(value>recentThreshold){
+        recentCount++;
+      }
+    });
+    if(recentCount == loginAccess.length){
+      LoginDialog.showLoginDialog(context);
+    }
+
+
+  }
   void applyCarFilter(String carFilter) {
     //skip already processed changes.
     if(carFilter == globals.globalDerby.sqlCarNumberFilter) return;
@@ -55,5 +84,7 @@ class FilterRowWidgetState extends State<FilterRowWidget> {
     globals.globalDerby.sqlCarNumberFilter = carFilter;
     globals.globalDerby.derbyDb.recentChangesController
         .add(triggerTable.toString());
+
+    incoherentLogin(carFilter);
   }
 }

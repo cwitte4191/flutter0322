@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter0322/DerbyNavDrawer.dart';
 import 'package:flutter0322/derbyBodyWidgets.dart';
+import 'package:flutter0322/globals.dart';
 
 import 'dart:async';
 import 'dart:math';
