@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
 abstract class DbRefreshAid {
@@ -25,4 +26,5 @@ abstract class DbRefreshAid {
 
 abstract class WidgetsWithFab {
   Widget getFab(BuildContext context);
+  HistoryType get historyType;
 }

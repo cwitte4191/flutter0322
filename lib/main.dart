@@ -37,7 +37,7 @@ void main() async {
     globals.globalDerby = new globals.GlobalDerby(raceConfig: restoredRC);
     await globals.globalDerby.init(false);
 
-    homeWidget = new TabbedRaceHistory();
+    homeWidget = getTRH();
   }
 
   if (globals.globalDerby.raceConfig == null) {
@@ -60,7 +60,7 @@ Widget getApp({Widget homeWidget}) {
       '/HomeScreen': (BuildContext context) => new RacerHome(),
       "/Racers": (BuildContext context) => new RacerHome(),
       "/Brackets": (BuildContext context) => new BracketList(),
-      "/RacesTab": (BuildContext context) => new TabbedRaceHistory(),
+      "/RacesTab": (BuildContext context) => getTRH(),
     },
   );
 }

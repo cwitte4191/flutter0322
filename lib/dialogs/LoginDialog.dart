@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter0322/appPages/TabbedRaceHistory.dart';
 import 'package:flutter0322/globals.dart';
 
 class LoginDialog extends StatefulWidget {
@@ -99,7 +98,7 @@ class LoginDialogState extends State<LoginDialog> {
     );
   }
 
-  String fakeLogin(String user) {
+  void fakeLogin(String user) {
     user=user.toLowerCase();
     Map<String,LoginRole>fakeMap={
       "ttt":LoginRole.Timer,

@@ -11,6 +11,7 @@ import 'package:flutter0322/widgets/RaceResultWidget.dart';
 import 'package:flutter0322/globals.dart' as globals;
 
 class RacePhasePage extends StatefulWidget implements WidgetsWithFab {
+  final HistoryType historyType=HistoryType.Phase;
   @override
   State<StatefulWidget> createState() {
     return new RacePhasePageState();
@@ -43,6 +44,7 @@ class RacePhasePage extends StatefulWidget implements WidgetsWithFab {
         },
         fullscreenDialog: true));
   }
+
 }
 
 class RacePhasePageState extends State<RacePhasePage> implements DbRefreshAid {
